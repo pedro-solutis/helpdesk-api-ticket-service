@@ -1,11 +1,19 @@
 package br.com.solutis.helpdesk.api_ticket_service.controller;
 
+import java.net.URI;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.solutis.helpdesk.api_ticket_service.model.Ticket;
+import br.com.solutis.helpdesk.api_ticket_service.model.TicketDetailDTO;
+import br.com.solutis.helpdesk.api_ticket_service.model.TicketRegistrationDTO;
 import br.com.solutis.helpdesk.api_ticket_service.service.TicketService;
+import jakarta.transaction.Transactional;
 
 @RestController
 @RequestMapping("/tickets")
@@ -14,8 +22,12 @@ public class TicketController {
     @Autowired 
     private TicketService ticketService;
 
-    public void createTicket(Ticket ticket){
-        // implement create ticket method
+    @PostMapping 
+    @Transactional 
+    public ResponseEntity<TicketDetailDTO> createTicket(TicketRegistrationDTO ticketRegistrationDTO, UriComponentsBuilder uriBuilder){
+        TicketDetailDTO createdTicket = ticketService.createTicket(ticketRegistrationDTO);
+        URI uri = uriBuilder.path("/tickets/{id}").buildAndExpand(createdTicket.id()).toUri();        
+        return ResponseEntity.created(uri).body(createdTicket);
     }
 
     public void updateTicket(Long id,Ticket ticket){

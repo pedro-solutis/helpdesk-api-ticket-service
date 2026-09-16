@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.solutis.helpdesk.api_ticket_service.model.Ticket;
+import br.com.solutis.helpdesk.api_ticket_service.model.TicketDetailDTO;
+import br.com.solutis.helpdesk.api_ticket_service.model.TicketRegistrationDTO;
 import br.com.solutis.helpdesk.api_ticket_service.repository.TicketRepository;
 
 @Service 
@@ -12,8 +14,10 @@ public class TicketService {
     @Autowired 
     private TicketRepository ticketRepository;
 
-    public void createTicket(Ticket ticket){
-        // implement create ticket method
+    public TicketDetailDTO createTicket(TicketRegistrationDTO ticketRegistrationDTO){
+        var newTicket = new Ticket(ticketRegistrationDTO);
+        ticketRepository.save(newTicket);
+        return new TicketDetailDTO(newTicket);
     }
 
     public void updateTicket(Long id,Ticket ticket){

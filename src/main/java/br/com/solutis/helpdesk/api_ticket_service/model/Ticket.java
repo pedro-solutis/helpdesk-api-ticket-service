@@ -57,4 +57,12 @@ public class Ticket {
     @NotNull 
     private LocalDateTime updatedAt;
 
+    public Ticket(TicketRegistrationDTO ticketRegistrationDTO) {
+        title = ticketRegistrationDTO.title();
+        description = ticketRegistrationDTO.description();
+        priority = ticketRegistrationDTO.priority();
+        category = ticketRegistrationDTO.category();
+        customerId = ticketRegistrationDTO.customerId();
+    }
+
 }
