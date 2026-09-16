@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import br.com.solutis.helpdesk.api_ticket_service.model.AssignTechnicianDTO;
 import br.com.solutis.helpdesk.api_ticket_service.model.TicketDetailDTO;
 import br.com.solutis.helpdesk.api_ticket_service.model.TicketListDTO;
 import br.com.solutis.helpdesk.api_ticket_service.model.TicketRegistrationDTO;
@@ -42,12 +44,15 @@ public class TicketController {
     @PutMapping("/{id}")
     @Transactional 
     public ResponseEntity<TicketDetailDTO> updateTicket(@PathVariable Long id, @RequestBody TicketUpdateDTO ticket){
-        var updatedTicket = ticketService.updateTicket( id, ticket);
+        var updatedTicket = ticketService.updateTicket(id, ticket);
         return ResponseEntity.ok(updatedTicket);
     }
 
-    public void updateTechnician(Long ticketId, Long technicianId){
-        // implement update technician method
+    @PatchMapping("/{id}")
+    @Transactional 
+    public ResponseEntity<TicketDetailDTO> assignTechnician(@PathVariable("id") Long ticketId, @RequestBody @Valid AssignTechnicianDTO assignTechnician){
+        var updatedTechnician = ticketService.assignTechnician(ticketId, assignTechnician);
+        return ResponseEntity.ok(updatedTechnician);
     }
 
     public void closeTicket(Long id){

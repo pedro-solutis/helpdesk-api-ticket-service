@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import br.com.solutis.helpdesk.api_ticket_service.model.AssignTechnicianDTO;
 import br.com.solutis.helpdesk.api_ticket_service.model.Ticket;
 import br.com.solutis.helpdesk.api_ticket_service.model.TicketDetailDTO;
 import br.com.solutis.helpdesk.api_ticket_service.model.TicketListDTO;
@@ -41,8 +42,13 @@ public class TicketService {
         return new TicketDetailDTO(updatedTicket);
     }
 
-    public void updateTechnician(Long ticketId, Long technicianId){
-        // implement update technician method
+    public TicketDetailDTO assignTechnician(Long ticketId, AssignTechnicianDTO assignTechnician){
+        var toUpdateTicket = ticketRepository.findById(ticketId).orElseThrow(() -> new IllegalArgumentException("Ticket not found"));
+        if(toUpdateTicket != null)
+            toUpdateTicket.setTechnicianId(assignTechnician.technicianId());
+        toUpdateTicket.setUpdatedAt(LocalDateTime.now());
+        var updatedTicket = ticketRepository.save(toUpdateTicket);
+        return new TicketDetailDTO(updatedTicket);
     }
 
     public void closeTicket(Long id){
