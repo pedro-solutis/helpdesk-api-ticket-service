@@ -1,5 +1,7 @@
 package br.com.solutis.helpdesk.api_ticket_service.service;
 
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,6 +11,7 @@ import br.com.solutis.helpdesk.api_ticket_service.model.Ticket;
 import br.com.solutis.helpdesk.api_ticket_service.model.TicketDetailDTO;
 import br.com.solutis.helpdesk.api_ticket_service.model.TicketListDTO;
 import br.com.solutis.helpdesk.api_ticket_service.model.TicketRegistrationDTO;
+import br.com.solutis.helpdesk.api_ticket_service.model.TicketUpdateDTO;
 import br.com.solutis.helpdesk.api_ticket_service.repository.TicketRepository;
 
 @Service 
@@ -23,8 +26,19 @@ public class TicketService {
         return new TicketDetailDTO(newTicket);
     }
 
-    public void updateTicket(Long id,Ticket ticket){
-        // implement update ticket method
+    public TicketDetailDTO updateTicket(Long id,TicketUpdateDTO ticket){
+        var toUpdateTicket = ticketRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Ticket not found"));
+        if(ticket.category() != null)
+            toUpdateTicket.setCategory(ticket.category());
+        if(ticket.priority() != null)
+            toUpdateTicket.setPriority(ticket.priority());
+        if (ticket.status() != null)
+            toUpdateTicket.setStatus(ticket.status());
+        if(ticket.description() != null)
+            toUpdateTicket.setDescription(ticket.description());
+        toUpdateTicket.setUpdatedAt(LocalDateTime.now());
+        var updatedTicket = ticketRepository.save(toUpdateTicket);
+        return new TicketDetailDTO(updatedTicket);
     }
 
     public void updateTechnician(Long ticketId, Long technicianId){

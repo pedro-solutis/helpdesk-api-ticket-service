@@ -10,15 +10,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import br.com.solutis.helpdesk.api_ticket_service.model.Ticket;
 import br.com.solutis.helpdesk.api_ticket_service.model.TicketDetailDTO;
 import br.com.solutis.helpdesk.api_ticket_service.model.TicketListDTO;
 import br.com.solutis.helpdesk.api_ticket_service.model.TicketRegistrationDTO;
+import br.com.solutis.helpdesk.api_ticket_service.model.TicketUpdateDTO;
 import br.com.solutis.helpdesk.api_ticket_service.service.TicketService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -38,8 +39,11 @@ public class TicketController {
         return ResponseEntity.created(uri).body(createdTicket);
     }
 
-    public void updateTicket(Long id,Ticket ticket){
-        // implement update ticket method
+    @PutMapping("/{id}")
+    @Transactional 
+    public ResponseEntity<TicketDetailDTO> updateTicket(@PathVariable Long id, @RequestBody TicketUpdateDTO ticket){
+        var updatedTicket = ticketService.updateTicket( id, ticket);
+        return ResponseEntity.ok(updatedTicket);
     }
 
     public void updateTechnician(Long ticketId, Long technicianId){
