@@ -42,7 +42,18 @@ public class TicketService {
 
     public TicketDetailDTO getTicketById(Long id){
         var ticket = ticketRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Ticket not found"));
-        return new TicketDetailDTO(ticket.getId(), ticket.getTitle(), ticket.getDescription(), ticket.getStatus(), ticket.getCategory(), ticket.getPriority(), ticket.getCustomerId(), ticket.getTechnicianId());
+        return new TicketDetailDTO(
+            ticket.getId(),
+            ticket.getTitle(),
+            ticket.getDescription(),
+            ticket.getStatus(),
+            ticket.getCategory(),
+            ticket.getPriority(),
+            ticket.getCustomerId(),
+            ticket.getTechnicianId(),
+            ticket.getCreatedAt(),
+            ticket.getUpdatedAt()
+        );
     }
 
     public void searchTicketByTitle(String title){

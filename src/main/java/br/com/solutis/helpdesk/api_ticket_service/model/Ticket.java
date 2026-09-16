@@ -63,6 +63,7 @@ public class Ticket {
         priority = ticketRegistrationDTO.priority();
         category = ticketRegistrationDTO.category();
         customerId = ticketRegistrationDTO.customerId();
+        updatedAt = LocalDateTime.now();
     }
 
 }

@@ -1,5 +1,7 @@
 package br.com.solutis.helpdesk.api_ticket_service.model;
 
+import java.time.LocalDateTime;
+
 public record TicketDetailDTO(
     Long id,
     String title,
@@ -8,7 +10,9 @@ public record TicketDetailDTO(
     Category category,
     Priority priority,
     Long customerId,
-    Long technicianId) {
+    Long technicianId,
+    LocalDateTime createdAt,
+    LocalDateTime updatedAt) {
 
     public TicketDetailDTO(Ticket newTicket) {
         this(
@@ -19,7 +23,9 @@ public record TicketDetailDTO(
             newTicket.getCategory(),
             newTicket.getPriority(),
             newTicket.getCustomerId(),
-            newTicket.getTechnicianId()
+            newTicket.getTechnicianId(),
+            newTicket.getCreatedAt(),
+            newTicket.getUpdatedAt()
         );
     }
 
