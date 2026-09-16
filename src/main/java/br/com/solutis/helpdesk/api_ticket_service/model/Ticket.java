@@ -66,4 +66,8 @@ public class Ticket {
         updatedAt = LocalDateTime.now();
     }
 
+    public void closeTicket(){
+        status = Status.CLOSED;
+    }
+
 }

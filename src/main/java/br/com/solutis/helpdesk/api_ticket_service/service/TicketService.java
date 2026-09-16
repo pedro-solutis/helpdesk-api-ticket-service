@@ -52,7 +52,9 @@ public class TicketService {
     }
 
     public void closeTicket(Long id){
-        // implement close ticket method
+        var toCloseTicket = ticketRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Ticket not found"));
+        toCloseTicket.closeTicket();
+        ticketRepository.save(toCloseTicket);
     }
 
     public void getTicketByCustomerId(Long customerId){
