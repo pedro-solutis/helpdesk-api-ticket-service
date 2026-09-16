@@ -57,8 +57,9 @@ public class TicketService {
         ticketRepository.save(toCloseTicket);
     }
 
-    public void getTicketByCustomerId(Long customerId){
-        // implement get ticket by customer id method
+    public TicketDetailDTO getTicketByCustomerId(Long customerId){
+        var ticket = ticketRepository.findByCustomerId(customerId);
+        return new TicketDetailDTO(ticket);
     }
 
     public Page<TicketListDTO> getAllTickets(Pageable pageable){

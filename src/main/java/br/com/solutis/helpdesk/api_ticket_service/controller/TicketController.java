@@ -63,8 +63,10 @@ public class TicketController {
         return ResponseEntity.ok("Ticket closed with success.");
     }
 
-    public void searchTicketByCustomerId(Long customerId){
-        // implement get ticket by customer id method
+    @GetMapping("/customer/{id}")
+    public ResponseEntity<TicketDetailDTO> searchTicketByCustomerId(Long customerId){
+        var ticket = ticketService.getTicketByCustomerId(customerId);
+        return ResponseEntity.ok(ticket);
     }
 
     @GetMapping 
