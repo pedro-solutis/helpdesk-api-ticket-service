@@ -3,6 +3,9 @@ package br.com.solutis.helpdesk.api_ticket_service.controller;
 import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +17,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.solutis.helpdesk.api_ticket_service.model.Ticket;
 import br.com.solutis.helpdesk.api_ticket_service.model.TicketDetailDTO;
+import br.com.solutis.helpdesk.api_ticket_service.model.TicketListDTO;
 import br.com.solutis.helpdesk.api_ticket_service.model.TicketRegistrationDTO;
 import br.com.solutis.helpdesk.api_ticket_service.service.TicketService;
 import jakarta.transaction.Transactional;
@@ -50,8 +54,10 @@ public class TicketController {
         // implement get ticket by customer id method
     }
 
-    public void getAllTickets(){
-        // implement get all tickets method
+    @GetMapping 
+    public ResponseEntity<Page<TicketListDTO>> getAllTickets(@PageableDefault(page=0, size = 10, sort = "createdAt") Pageable pageable){
+        var tickets = ticketService.getAllTickets(pageable);
+        return ResponseEntity.ok(tickets);
     }
 
     @GetMapping("/{id}")

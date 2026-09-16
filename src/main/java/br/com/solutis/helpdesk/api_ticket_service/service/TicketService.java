@@ -1,10 +1,13 @@
 package br.com.solutis.helpdesk.api_ticket_service.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import br.com.solutis.helpdesk.api_ticket_service.model.Ticket;
 import br.com.solutis.helpdesk.api_ticket_service.model.TicketDetailDTO;
+import br.com.solutis.helpdesk.api_ticket_service.model.TicketListDTO;
 import br.com.solutis.helpdesk.api_ticket_service.model.TicketRegistrationDTO;
 import br.com.solutis.helpdesk.api_ticket_service.repository.TicketRepository;
 
@@ -36,24 +39,14 @@ public class TicketService {
         // implement get ticket by customer id method
     }
 
-    public void getAllTickets(){
-        // implement get all tickets method
+    public Page<TicketListDTO> getAllTickets(Pageable pageable){
+        var tickets = ticketRepository.findAll(pageable);
+        return tickets.map(TicketListDTO::new);
     }
 
     public TicketDetailDTO getTicketById(Long id){
         var ticket = ticketRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Ticket not found"));
-        return new TicketDetailDTO(
-            ticket.getId(),
-            ticket.getTitle(),
-            ticket.getDescription(),
-            ticket.getStatus(),
-            ticket.getCategory(),
-            ticket.getPriority(),
-            ticket.getCustomerId(),
-            ticket.getTechnicianId(),
-            ticket.getCreatedAt(),
-            ticket.getUpdatedAt()
-        );
+        return new TicketDetailDTO(ticket);
     }
 
     public void searchTicketByTitle(String title){
