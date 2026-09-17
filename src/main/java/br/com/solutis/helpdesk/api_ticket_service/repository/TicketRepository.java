@@ -1,7 +1,13 @@
 package br.com.solutis.helpdesk.api_ticket_service.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
+import br.com.solutis.helpdesk.api_ticket_service.model.Category;
+import br.com.solutis.helpdesk.api_ticket_service.model.Priority;
+import br.com.solutis.helpdesk.api_ticket_service.model.Status;
 import br.com.solutis.helpdesk.api_ticket_service.model.Ticket;
 
 public interface TicketRepository extends JpaRepository<Ticket, Long>{
@@ -9,5 +15,13 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>{
     Ticket findByCustomerId(Long customerId);
 
 	Ticket findByTitleContainingIgnoreCase(String title);
+
+    @Query(
+        "SELECT t FROM Ticket t WHERE " + 
+        "(:status IS NULL OR t.status = :status) AND " +
+        "(:category IS NULL OR t.category = :category) AND" +
+        "(:priority IS NULL OR t.priority = :priority)"
+    )
+    Page<Ticket> filterTickets(Status status, Category category, Priority priority, Pageable pageable);
 
 }

@@ -8,6 +8,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import br.com.solutis.helpdesk.api_ticket_service.model.AssignTechnicianDTO;
+import br.com.solutis.helpdesk.api_ticket_service.model.Category;
+import br.com.solutis.helpdesk.api_ticket_service.model.Priority;
+import br.com.solutis.helpdesk.api_ticket_service.model.Status;
 import br.com.solutis.helpdesk.api_ticket_service.model.Ticket;
 import br.com.solutis.helpdesk.api_ticket_service.model.TicketDetailDTO;
 import br.com.solutis.helpdesk.api_ticket_service.model.TicketListDTO;
@@ -77,8 +80,9 @@ public class TicketService {
         return new TicketDetailDTO(ticket);
     }
 
-    public void filterTickets(String status, String priority, String category){
-        // implement filter by status, priority and category
+    public Page<TicketListDTO> filterTickets(Status status, Category category, Priority priority, Pageable pageable){
+        var tickets = ticketRepository.filterTickets(status, category, priority, pageable);
+        return tickets.map(TicketListDTO::new);
     }
 
 }

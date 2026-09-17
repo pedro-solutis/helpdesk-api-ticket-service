@@ -20,6 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.solutis.helpdesk.api_ticket_service.model.AssignTechnicianDTO;
+import br.com.solutis.helpdesk.api_ticket_service.model.Category;
+import br.com.solutis.helpdesk.api_ticket_service.model.Priority;
+import br.com.solutis.helpdesk.api_ticket_service.model.Status;
 import br.com.solutis.helpdesk.api_ticket_service.model.TicketDetailDTO;
 import br.com.solutis.helpdesk.api_ticket_service.model.TicketListDTO;
 import br.com.solutis.helpdesk.api_ticket_service.model.TicketRegistrationDTO;
@@ -88,7 +91,13 @@ public class TicketController {
         return ResponseEntity.ok(ticket);
     }
 
-    public void filterTickets(String status, String priority, String category){
-        // implement filter by status, priority and category
+    @GetMapping("/filter")
+    public ResponseEntity<Page<TicketListDTO>> filterTickets(
+        @RequestParam(required = false) Status status,
+        @RequestParam(required = false) Category category,
+        @RequestParam(required = false) Priority priority,
+        Pageable pageable){
+        var ticket = ticketService.filterTickets(status, category, priority, pageable);
+        return  ResponseEntity.ok(ticket);
     }
 }
