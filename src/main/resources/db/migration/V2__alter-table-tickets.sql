@@ -1,0 +1,3 @@
+ALTER TABLE tickets ALTER COLUMN description TYPE TEXT;
+
+ALTER TABLE tickets ALTER COLUMN updated_at DROP NOT NULL;

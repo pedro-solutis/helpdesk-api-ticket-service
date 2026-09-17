@@ -2,6 +2,9 @@ package br.com.solutis.helpdesk.api_ticket_service.model;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,8 +13,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,35 +30,36 @@ public class Ticket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @NotBlank 
+    @Column(nullable = false) 
     private String title;
     
-    @NotBlank 
+    @Column(nullable = false, columnDefinition = "TEXT") 
     private String description;
 
     @Enumerated(EnumType.STRING)
-    @NotNull 
+    @Column(nullable = false) 
     private Priority priority;
     
     @Enumerated(EnumType.STRING)
-    @NotNull  
+    @Column(nullable = false)  
     private Status status = Status.OPEN;
     
     @Enumerated(EnumType.STRING)
-    @NotNull 
+    @Column(nullable = false) 
     private Category category;
     
-    @Column(name = "customer_id")
-    @NotNull 
+    @Column(name = "customer_id", nullable = false)
     private Long customerId;
     
-    @Column(name = "technician_id")
+    @Column(name = "technician_id", nullable = true)
     private Long technicianId;
     
-    @NotNull 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(name = "created_at")
+    @CreationTimestamp  
+    private LocalDateTime createdAt;
     
-    @NotNull 
+    @Column(name = "updated_at")
+    @UpdateTimestamp 
     private LocalDateTime updatedAt;
 
     public Ticket(TicketRegistrationDTO ticketRegistrationDTO) {

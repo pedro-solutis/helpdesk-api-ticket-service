@@ -19,7 +19,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>{
     @Query(
         "SELECT t FROM Ticket t WHERE " + 
         "(:status IS NULL OR t.status = :status) AND " +
-        "(:category IS NULL OR t.category = :category) AND" +
+        "(:category IS NULL OR t.category = :category) AND " +
         "(:priority IS NULL OR t.priority = :priority)"
     )
     Page<Ticket> filterTickets(Status status, Category category, Priority priority, Pageable pageable);

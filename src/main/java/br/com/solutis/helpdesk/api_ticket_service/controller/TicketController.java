@@ -30,6 +30,7 @@ import br.com.solutis.helpdesk.api_ticket_service.model.TicketUpdateDTO;
 import br.com.solutis.helpdesk.api_ticket_service.service.TicketService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 
 @RestController
 @RequestMapping("/tickets")
@@ -48,7 +49,7 @@ public class TicketController {
 
     @PutMapping("/{id}")
     @Transactional 
-    public ResponseEntity<TicketDetailDTO> updateTicket(@PathVariable Long id, @RequestBody TicketUpdateDTO ticket){
+    public ResponseEntity<TicketDetailDTO> updateTicket(@PathVariable Long id, @RequestBody @Valid TicketUpdateDTO ticket){
         var updatedTicket = ticketService.updateTicket(id, ticket);
         return ResponseEntity.ok(updatedTicket);
     }
@@ -86,7 +87,7 @@ public class TicketController {
     }
 
     @GetMapping ("/search")
-    public ResponseEntity<Page<TicketListDTO>> searchTicketByTitle(@RequestParam @Valid String title, Pageable pageable){
+    public ResponseEntity<Page<TicketListDTO>> searchTicketByTitle(@RequestParam @NotBlank String title, Pageable pageable){
         var ticket = ticketService.searchTicketByTitle(title, pageable);
         return ResponseEntity.ok(ticket);
     }
