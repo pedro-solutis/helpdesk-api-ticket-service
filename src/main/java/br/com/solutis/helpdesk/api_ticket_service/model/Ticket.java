@@ -16,12 +16,10 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table (name = "tickets")
 @Getter 
-@Setter
 @AllArgsConstructor 
 @NoArgsConstructor
 public class Ticket {
@@ -68,7 +66,6 @@ public class Ticket {
         priority = ticketRegistrationDTO.priority();
         category = ticketRegistrationDTO.category();
         customerId = ticketRegistrationDTO.customerId();
-        updatedAt = LocalDateTime.now();
     }
 
     public void assignTechnician(AssignTechnicianDTO assignTechnicianDTO){
@@ -81,9 +78,24 @@ public class Ticket {
     }
 
     public boolean isClose(){
-        if((status != Status.CLOSED)){
-            return false;
+        if((status == Status.CLOSED)){
+            return true;
         }
-        return true;
+        return false;
+    }
+
+    public void updateTicket(TicketUpdateDTO ticketUpdateDTO){
+        if (ticketUpdateDTO.status() != null){
+            status = ticketUpdateDTO.status();
+        }
+        if (ticketUpdateDTO.category() != null){
+            category = ticketUpdateDTO.category();
+        }
+        if (ticketUpdateDTO.priority() != null){
+            priority = ticketUpdateDTO.priority();
+        }
+        if (ticketUpdateDTO.description() != null){
+            description = ticketUpdateDTO.description();
+        }
     }
 }

@@ -1,7 +1,5 @@
 package br.com.solutis.helpdesk.api_ticket_service.service;
 
-import java.time.LocalDateTime;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +16,6 @@ import br.com.solutis.helpdesk.api_ticket_service.model.TicketListDTO;
 import br.com.solutis.helpdesk.api_ticket_service.model.TicketRegistrationDTO;
 import br.com.solutis.helpdesk.api_ticket_service.model.TicketUpdateDTO;
 import br.com.solutis.helpdesk.api_ticket_service.repository.TicketRepository;
-import jakarta.validation.ValidationException;
 
 @Service 
 public class TicketService {
@@ -32,17 +29,11 @@ public class TicketService {
         return new TicketDetailDTO(newTicket);
     }
 
-    public TicketDetailDTO updateTicket(Long id,TicketUpdateDTO ticket){
+    public TicketDetailDTO updateTicket(Long id,TicketUpdateDTO ticketDto){
         var toUpdateTicket = ticketRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
-        if(ticket.category() != null)
-            toUpdateTicket.setCategory(ticket.category());
-        if(ticket.priority() != null)
-            toUpdateTicket.setPriority(ticket.priority());
-        if (ticket.status() != null)
-            toUpdateTicket.setStatus(ticket.status());
-        if(ticket.description() != null)
-            toUpdateTicket.setDescription(ticket.description());
-        toUpdateTicket.setUpdatedAt(LocalDateTime.now());
+        if(ticketDto.status() != null && toUpdateTicket.isClose())
+            throw new IllegalArgumentException("It is not possible change status for a closed ticket.");
+        toUpdateTicket.updateTicket(ticketDto);
         var updatedTicket = ticketRepository.save(toUpdateTicket);
         return new TicketDetailDTO(updatedTicket);
     }
@@ -50,7 +41,7 @@ public class TicketService {
     public TicketDetailDTO assignTechnician(Long ticketId, AssignTechnicianDTO assignTechnicianDTO){
         var toUpdateTicket = ticketRepository.findById(ticketId).orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
         if(toUpdateTicket.isClose())
-            throw new ValidationException("It is not possible assign a technician for a closed ticket.");
+            throw new IllegalArgumentException("It is not possible assign a technician for a closed ticket.");
         toUpdateTicket.assignTechnician(assignTechnicianDTO);
         var updatedTicket = ticketRepository.save(toUpdateTicket);
         return new TicketDetailDTO(updatedTicket);
