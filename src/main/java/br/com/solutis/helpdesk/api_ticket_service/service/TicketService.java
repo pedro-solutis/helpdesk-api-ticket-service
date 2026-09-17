@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import br.com.solutis.helpdesk.api_ticket_service.infra.exception.ResourceNotFoundException;
 import br.com.solutis.helpdesk.api_ticket_service.model.AssignTechnicianDTO;
 import br.com.solutis.helpdesk.api_ticket_service.model.Category;
 import br.com.solutis.helpdesk.api_ticket_service.model.Priority;
@@ -31,7 +32,7 @@ public class TicketService {
     }
 
     public TicketDetailDTO updateTicket(Long id,TicketUpdateDTO ticket){
-        var toUpdateTicket = ticketRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Ticket not found"));
+        var toUpdateTicket = ticketRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
         if(ticket.category() != null)
             toUpdateTicket.setCategory(ticket.category());
         if(ticket.priority() != null)
@@ -46,7 +47,7 @@ public class TicketService {
     }
 
     public TicketDetailDTO assignTechnician(Long ticketId, AssignTechnicianDTO assignTechnician){
-        var toUpdateTicket = ticketRepository.findById(ticketId).orElseThrow(() -> new IllegalArgumentException("Ticket not found"));
+        var toUpdateTicket = ticketRepository.findById(ticketId).orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
         if(toUpdateTicket != null)
             toUpdateTicket.setTechnicianId(assignTechnician.technicianId());
         toUpdateTicket.setUpdatedAt(LocalDateTime.now());
@@ -55,7 +56,7 @@ public class TicketService {
     }
 
     public void closeTicket(Long id){
-        var toCloseTicket = ticketRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Ticket not found"));
+        var toCloseTicket = ticketRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
         toCloseTicket.closeTicket();
         ticketRepository.save(toCloseTicket);
     }
@@ -71,7 +72,7 @@ public class TicketService {
     }
 
     public TicketDetailDTO getTicketById(Long id){
-        var ticket = ticketRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Ticket not found"));
+        var ticket = ticketRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
         return new TicketDetailDTO(ticket);
     }
 
