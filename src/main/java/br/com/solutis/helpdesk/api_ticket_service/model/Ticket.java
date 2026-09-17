@@ -2,6 +2,7 @@ package br.com.solutis.helpdesk.api_ticket_service.model;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -46,9 +47,11 @@ public class Ticket {
     @NotNull 
     private Category category;
     
+    @Column(name = "customer_id")
     @NotNull 
     private Long customerId;
     
+    @Column(name = "technician_id")
     private Long technicianId;
     
     @NotNull 

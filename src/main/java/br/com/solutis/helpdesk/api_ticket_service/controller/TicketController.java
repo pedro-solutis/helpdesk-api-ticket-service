@@ -68,7 +68,7 @@ public class TicketController {
     }
 
     @GetMapping("/customer/{id}")
-    public ResponseEntity<Page<TicketListDTO>> searchTicketByCustomerId(@PathVariable Long customerId, Pageable pageable){
+    public ResponseEntity<Page<TicketListDTO>> searchTicketByCustomerId(@PathVariable("id") Long customerId, Pageable pageable){
         var tickets = ticketService.getAllTicketByCustomerId(customerId, pageable);
         return ResponseEntity.ok(tickets);
     }
