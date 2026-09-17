@@ -12,8 +12,6 @@ import br.com.solutis.helpdesk.api_ticket_service.model.Ticket;
 
 public interface TicketRepository extends JpaRepository<Ticket, Long>{
 
-    Ticket findByCustomerId(Long customerId);
-
 	Page<Ticket> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 
     @Query(
