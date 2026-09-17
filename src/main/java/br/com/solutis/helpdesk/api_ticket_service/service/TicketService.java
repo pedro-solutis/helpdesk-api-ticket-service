@@ -75,9 +75,9 @@ public class TicketService {
         return new TicketDetailDTO(ticket);
     }
 
-    public TicketDetailDTO searchTicketByTitle(String title){
-        var ticket = ticketRepository.findByTitleContainingIgnoreCase(title);
-        return new TicketDetailDTO(ticket);
+    public Page<TicketListDTO> searchTicketByTitle(String title, Pageable pageable){
+        var tickets = ticketRepository.findByTitleContainingIgnoreCase(title, pageable);
+        return tickets.map(TicketListDTO::new);
     }
 
     public Page<TicketListDTO> filterTickets(Status status, Category category, Priority priority, Pageable pageable){

@@ -86,8 +86,8 @@ public class TicketController {
     }
 
     @GetMapping ("/search")
-    public ResponseEntity<TicketDetailDTO> searchTicketByTitle(@RequestParam @Valid String title){
-        var ticket = ticketService.searchTicketByTitle(title);
+    public ResponseEntity<Page<TicketListDTO>> searchTicketByTitle(@RequestParam @Valid String title, Pageable pageable){
+        var ticket = ticketService.searchTicketByTitle(title, pageable);
         return ResponseEntity.ok(ticket);
     }
 

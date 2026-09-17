@@ -14,7 +14,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>{
 
     Ticket findByCustomerId(Long customerId);
 
-	Ticket findByTitleContainingIgnoreCase(String title);
+	Page<Ticket> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 
     @Query(
         "SELECT t FROM Ticket t WHERE " + 
