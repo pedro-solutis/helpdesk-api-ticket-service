@@ -24,4 +24,6 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>{
     )
     Page<Ticket> filterTickets(Status status, Category category, Priority priority, Pageable pageable);
 
+    Page<Ticket> findAllByCustomerId(Long customerId, Pageable pageable);
+
 }

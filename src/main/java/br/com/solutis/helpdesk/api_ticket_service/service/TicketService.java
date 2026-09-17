@@ -60,9 +60,9 @@ public class TicketService {
         ticketRepository.save(toCloseTicket);
     }
 
-    public TicketDetailDTO getTicketByCustomerId(Long customerId){
-        var ticket = ticketRepository.findByCustomerId(customerId);
-        return new TicketDetailDTO(ticket);
+    public Page<TicketListDTO> getAllTicketByCustomerId(Long customerId, Pageable pageable){
+        var tickets = ticketRepository.findAllByCustomerId(customerId, pageable);
+        return tickets.map(TicketListDTO::new);
     }
 
     public Page<TicketListDTO> getAllTickets(Pageable pageable){

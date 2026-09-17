@@ -68,9 +68,9 @@ public class TicketController {
     }
 
     @GetMapping("/customer/{id}")
-    public ResponseEntity<TicketDetailDTO> searchTicketByCustomerId(Long customerId){
-        var ticket = ticketService.getTicketByCustomerId(customerId);
-        return ResponseEntity.ok(ticket);
+    public ResponseEntity<Page<TicketListDTO>> searchTicketByCustomerId(@PathVariable Long customerId, Pageable pageable){
+        var tickets = ticketService.getAllTicketByCustomerId(customerId, pageable);
+        return ResponseEntity.ok(tickets);
     }
 
     @GetMapping 
