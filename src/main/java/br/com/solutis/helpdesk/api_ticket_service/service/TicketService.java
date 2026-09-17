@@ -18,6 +18,7 @@ import br.com.solutis.helpdesk.api_ticket_service.model.TicketListDTO;
 import br.com.solutis.helpdesk.api_ticket_service.model.TicketRegistrationDTO;
 import br.com.solutis.helpdesk.api_ticket_service.model.TicketUpdateDTO;
 import br.com.solutis.helpdesk.api_ticket_service.repository.TicketRepository;
+import jakarta.validation.ValidationException;
 
 @Service 
 public class TicketService {
@@ -46,11 +47,11 @@ public class TicketService {
         return new TicketDetailDTO(updatedTicket);
     }
 
-    public TicketDetailDTO assignTechnician(Long ticketId, AssignTechnicianDTO assignTechnician){
+    public TicketDetailDTO assignTechnician(Long ticketId, AssignTechnicianDTO assignTechnicianDTO){
         var toUpdateTicket = ticketRepository.findById(ticketId).orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
-        if(toUpdateTicket != null)
-            toUpdateTicket.setTechnicianId(assignTechnician.technicianId());
-        toUpdateTicket.setUpdatedAt(LocalDateTime.now());
+        if(toUpdateTicket.isClose())
+            throw new ValidationException("It is not possible assign a technician for a closed ticket.");
+        toUpdateTicket.assignTechnician(assignTechnicianDTO);
         var updatedTicket = ticketRepository.save(toUpdateTicket);
         return new TicketDetailDTO(updatedTicket);
     }

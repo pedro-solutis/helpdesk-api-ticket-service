@@ -71,8 +71,19 @@ public class Ticket {
         updatedAt = LocalDateTime.now();
     }
 
+    public void assignTechnician(AssignTechnicianDTO assignTechnicianDTO){
+        technicianId = assignTechnicianDTO.technicianId();
+        status = Status.IN_PROGRESS;
+    }
+
     public void closeTicket(){
         status = Status.CLOSED;
     }
 
+    public boolean isClose(){
+        if((status != Status.CLOSED)){
+            return false;
+        }
+        return true;
+    }
 }
