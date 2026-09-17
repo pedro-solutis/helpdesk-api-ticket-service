@@ -16,6 +16,8 @@ import br.com.solutis.helpdesk.api_ticket_service.model.Priority;
 import br.com.solutis.helpdesk.api_ticket_service.model.Status;
 import br.com.solutis.helpdesk.api_ticket_service.model.Ticket;
 import br.com.solutis.helpdesk.api_ticket_service.repository.TicketRepository;
+import br.com.solutis.helpdesk.api_ticket_service.validation.CustomerValidator;
+import br.com.solutis.helpdesk.api_ticket_service.validation.TechnicianValidator;
 
 @Service 
 public class TicketService {
@@ -23,7 +25,15 @@ public class TicketService {
     @Autowired 
     private TicketRepository ticketRepository;
 
+    @Autowired 
+    private CustomerValidator customerValidator;
+
+    @Autowired 
+    private TechnicianValidator technicianValidator;
+
     public TicketDetailDTO createTicket(TicketRegistrationDTO ticketRegistrationDTO){
+        if(!customerValidator.userExist(ticketRegistrationDTO.customerId()))
+            throw new IllegalArgumentException("This user can not be assigned as a customer");
         var newTicket = new Ticket(ticketRegistrationDTO);
         ticketRepository.save(newTicket);
         return new TicketDetailDTO(newTicket);
@@ -39,6 +49,8 @@ public class TicketService {
     }
 
     public TicketDetailDTO assignTechnician(Long ticketId, AssignTechnicianDTO assignTechnicianDTO){
+        if (!technicianValidator.userExist(assignTechnicianDTO.technicianId()))
+            throw new IllegalArgumentException("This user can not be assigned as a technician");
         var toUpdateTicket = ticketRepository.findById(ticketId).orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
         if(toUpdateTicket.isClose())
             throw new IllegalArgumentException("It is not possible assign a technician for a closed ticket.");
