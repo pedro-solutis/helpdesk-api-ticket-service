@@ -8,4 +8,6 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>{
 
     Ticket findByCustomerId(Long customerId);
 
+	Ticket findByTitleContainingIgnoreCase(String title);
+
 }

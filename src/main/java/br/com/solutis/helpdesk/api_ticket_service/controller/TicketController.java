@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -81,8 +82,10 @@ public class TicketController {
         return ResponseEntity.ok(ticket);
     }
 
-    public void searchTicketByTitle(String title){
-        // implement search ticket by title method
+    @GetMapping ("/search")
+    public ResponseEntity<TicketDetailDTO> searchTicketByTitle(@RequestParam @Valid String title){
+        var ticket = ticketService.searchTicketByTitle(title);
+        return ResponseEntity.ok(ticket);
     }
 
     public void filterTickets(String status, String priority, String category){

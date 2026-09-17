@@ -72,8 +72,9 @@ public class TicketService {
         return new TicketDetailDTO(ticket);
     }
 
-    public void searchTicketByTitle(String title){
-        // implement search ticket by title method
+    public TicketDetailDTO searchTicketByTitle(String title){
+        var ticket = ticketRepository.findByTitleContainingIgnoreCase(title);
+        return new TicketDetailDTO(ticket);
     }
 
     public void filterTickets(String status, String priority, String category){
