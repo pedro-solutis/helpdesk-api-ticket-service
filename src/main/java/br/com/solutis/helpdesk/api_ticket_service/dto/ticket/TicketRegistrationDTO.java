@@ -1,5 +1,7 @@
-package br.com.solutis.helpdesk.api_ticket_service.model;
+package br.com.solutis.helpdesk.api_ticket_service.dto.ticket;
 
+import br.com.solutis.helpdesk.api_ticket_service.model.Category;
+import br.com.solutis.helpdesk.api_ticket_service.model.Priority;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 

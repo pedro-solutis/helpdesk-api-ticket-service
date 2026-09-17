@@ -1,4 +1,4 @@
-package br.com.solutis.helpdesk.api_ticket_service.model;
+package br.com.solutis.helpdesk.api_ticket_service.dto.ticket;
 
 import jakarta.validation.constraints.NotNull;
 

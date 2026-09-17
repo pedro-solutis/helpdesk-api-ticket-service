@@ -19,14 +19,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import br.com.solutis.helpdesk.api_ticket_service.model.AssignTechnicianDTO;
+import br.com.solutis.helpdesk.api_ticket_service.dto.ticket.*;
 import br.com.solutis.helpdesk.api_ticket_service.model.Category;
 import br.com.solutis.helpdesk.api_ticket_service.model.Priority;
 import br.com.solutis.helpdesk.api_ticket_service.model.Status;
-import br.com.solutis.helpdesk.api_ticket_service.model.TicketDetailDTO;
-import br.com.solutis.helpdesk.api_ticket_service.model.TicketListDTO;
-import br.com.solutis.helpdesk.api_ticket_service.model.TicketRegistrationDTO;
-import br.com.solutis.helpdesk.api_ticket_service.model.TicketUpdateDTO;
 import br.com.solutis.helpdesk.api_ticket_service.service.TicketService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;

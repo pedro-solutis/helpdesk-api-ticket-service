@@ -1,6 +1,11 @@
-package br.com.solutis.helpdesk.api_ticket_service.model;
+package br.com.solutis.helpdesk.api_ticket_service.dto.ticket;
 
 import java.time.LocalDateTime;
+
+import br.com.solutis.helpdesk.api_ticket_service.model.Category;
+import br.com.solutis.helpdesk.api_ticket_service.model.Priority;
+import br.com.solutis.helpdesk.api_ticket_service.model.Status;
+import br.com.solutis.helpdesk.api_ticket_service.model.Ticket;
 
 public record TicketDetailDTO(
     Long id,

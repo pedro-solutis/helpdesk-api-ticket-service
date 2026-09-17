@@ -5,6 +5,9 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import br.com.solutis.helpdesk.api_ticket_service.dto.ticket.AssignTechnicianDTO;
+import br.com.solutis.helpdesk.api_ticket_service.dto.ticket.TicketRegistrationDTO;
+import br.com.solutis.helpdesk.api_ticket_service.dto.ticket.TicketUpdateDTO;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

@@ -5,16 +5,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import br.com.solutis.helpdesk.api_ticket_service.dto.ticket.AssignTechnicianDTO;
+import br.com.solutis.helpdesk.api_ticket_service.dto.ticket.TicketDetailDTO;
+import br.com.solutis.helpdesk.api_ticket_service.dto.ticket.TicketListDTO;
+import br.com.solutis.helpdesk.api_ticket_service.dto.ticket.TicketRegistrationDTO;
+import br.com.solutis.helpdesk.api_ticket_service.dto.ticket.TicketUpdateDTO;
 import br.com.solutis.helpdesk.api_ticket_service.infra.exception.ResourceNotFoundException;
-import br.com.solutis.helpdesk.api_ticket_service.model.AssignTechnicianDTO;
 import br.com.solutis.helpdesk.api_ticket_service.model.Category;
 import br.com.solutis.helpdesk.api_ticket_service.model.Priority;
 import br.com.solutis.helpdesk.api_ticket_service.model.Status;
 import br.com.solutis.helpdesk.api_ticket_service.model.Ticket;
-import br.com.solutis.helpdesk.api_ticket_service.model.TicketDetailDTO;
-import br.com.solutis.helpdesk.api_ticket_service.model.TicketListDTO;
-import br.com.solutis.helpdesk.api_ticket_service.model.TicketRegistrationDTO;
-import br.com.solutis.helpdesk.api_ticket_service.model.TicketUpdateDTO;
 import br.com.solutis.helpdesk.api_ticket_service.repository.TicketRepository;
 
 @Service 
