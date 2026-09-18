@@ -59,10 +59,11 @@ public class TicketService {
         return new TicketDetailDTO(updatedTicket);
     }
 
-    public void closeTicket(Long id){
+    public TicketDetailDTO closeTicket(Long id){
         var toCloseTicket = ticketRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
         toCloseTicket.closeTicket();
-        ticketRepository.save(toCloseTicket);
+        var closedTicket = ticketRepository.save(toCloseTicket);
+        return new TicketDetailDTO(closedTicket);
     }
 
     public Page<TicketListDTO> getAllTicketByCustomerId(Long customerId, Pageable pageable){

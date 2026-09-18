@@ -59,9 +59,9 @@ public class TicketController {
 
     @PatchMapping("/{id}")
     @Transactional 
-    public ResponseEntity<String> closeTicket(@PathVariable("id") Long ticketId){
-        ticketService.closeTicket(ticketId);
-        return ResponseEntity.ok("Ticket closed with success.");
+    public ResponseEntity<TicketDetailDTO> closeTicket(@PathVariable("id") Long ticketId){
+        var ticket = ticketService.closeTicket(ticketId);
+        return ResponseEntity.ok(ticket);
     }
 
     @GetMapping("/customer/{id}")
