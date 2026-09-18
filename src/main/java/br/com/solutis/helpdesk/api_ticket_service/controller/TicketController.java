@@ -57,10 +57,10 @@ public class TicketController {
         return ResponseEntity.ok(updatedTechnician);
     }
 
-    @DeleteMapping("/{id}")
+    @PatchMapping("/{id}")
     @Transactional 
-    public ResponseEntity<?> closeTicket(@PathVariable Long id){
-        ticketService.closeTicket(id);
+    public ResponseEntity<String> closeTicket(@PathVariable("id") Long ticketId){
+        ticketService.closeTicket(ticketId);
         return ResponseEntity.ok("Ticket closed with success.");
     }
 
