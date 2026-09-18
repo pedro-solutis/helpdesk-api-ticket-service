@@ -1,4 +1,4 @@
-package br.com.solutis.helpdesk.api_ticket_service.validation;
+package br.com.solutis.helpdesk.api_ticket_service.validation.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 

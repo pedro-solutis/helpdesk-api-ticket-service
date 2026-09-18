@@ -17,8 +17,8 @@ import br.com.solutis.helpdesk.api_ticket_service.model.Priority;
 import br.com.solutis.helpdesk.api_ticket_service.model.Status;
 import br.com.solutis.helpdesk.api_ticket_service.model.Ticket;
 import br.com.solutis.helpdesk.api_ticket_service.repository.TicketRepository;
-import br.com.solutis.helpdesk.api_ticket_service.validation.CustomerValidator;
-import br.com.solutis.helpdesk.api_ticket_service.validation.TechnicianValidator;
+import br.com.solutis.helpdesk.api_ticket_service.validation.user.CustomerValidator;
+import br.com.solutis.helpdesk.api_ticket_service.validation.user.TechnicianValidator;
 
 @Service 
 public class TicketService {
