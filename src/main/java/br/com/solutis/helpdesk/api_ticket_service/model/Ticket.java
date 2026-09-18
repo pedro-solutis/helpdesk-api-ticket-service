@@ -70,8 +70,8 @@ public class Ticket {
     public Ticket(TicketRegistrationDTO ticketRegistrationDTO) {
         title = ticketRegistrationDTO.title();
         description = ticketRegistrationDTO.description();
-        priority = ticketRegistrationDTO.priority();
-        category = ticketRegistrationDTO.category();
+        priority = Priority.valueOf(ticketRegistrationDTO.priority());
+        category = Category.valueOf(ticketRegistrationDTO.category());
         customerId = ticketRegistrationDTO.customerId();
     }
 
@@ -93,13 +93,13 @@ public class Ticket {
 
     public void updateTicket(TicketUpdateDTO ticketUpdateDTO){
         if (ticketUpdateDTO.status() != null){
-            status = ticketUpdateDTO.status();
+            status = Status.valueOf(ticketUpdateDTO.status());
         }
         if (ticketUpdateDTO.category() != null){
-            category = ticketUpdateDTO.category();
+            category = Category.valueOf(ticketUpdateDTO.category());
         }
         if (ticketUpdateDTO.priority() != null){
-            priority = ticketUpdateDTO.priority();
+            priority = Priority.valueOf(ticketUpdateDTO.priority());
         }
         if (ticketUpdateDTO.description() != null){
             description = ticketUpdateDTO.description();
