@@ -91,4 +91,12 @@ public class TicketService {
         return tickets.map(TicketListDTO::new);
     }
 
+    public void deleteTicket(Long ticketId) {
+        var toDeleteTicket = ticketRepository.findById(ticketId).orElseThrow(() -> new ResourceNotFoundException("Ticket not founded"));
+        toDeleteTicket.deleteTicket();
+        if(!toDeleteTicket.isClose())
+            toDeleteTicket.closeTicket();
+        ticketRepository.save(toDeleteTicket);
+    }
+
 }

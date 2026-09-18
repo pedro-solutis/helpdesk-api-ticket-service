@@ -106,4 +106,7 @@ public class Ticket {
         }
     }
 
+    public void deleteTicket(){
+        active = false;
+    }
 }

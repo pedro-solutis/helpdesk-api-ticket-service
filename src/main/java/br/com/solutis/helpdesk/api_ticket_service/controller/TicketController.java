@@ -97,4 +97,10 @@ public class TicketController {
         var ticket = ticketService.filterTickets(status, category, priority, pageable);
         return  ResponseEntity.ok(ticket);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteTicket(@PathVariable("id") Long ticketId){
+        ticketService.deleteTicket(ticketId);
+        return ResponseEntity.noContent().build();
+    }
 }
