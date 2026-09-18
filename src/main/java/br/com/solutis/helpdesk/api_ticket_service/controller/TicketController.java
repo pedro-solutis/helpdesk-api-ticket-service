@@ -50,7 +50,7 @@ public class TicketController {
         return ResponseEntity.ok(updatedTicket);
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/technician/{id}")
     @Transactional 
     public ResponseEntity<TicketDetailDTO> assignTechnician(@PathVariable("id") Long ticketId, @RequestBody @Valid AssignTechnicianDTO assignTechnician){
         var updatedTechnician = ticketService.assignTechnician(ticketId, assignTechnician);
