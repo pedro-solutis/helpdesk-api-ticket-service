@@ -3,8 +3,8 @@ package br.com.solutis.helpdesk.api_ticket_service.model;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
-
 import br.com.solutis.helpdesk.api_ticket_service.dto.ticket.AssignTechnicianDTO;
 import br.com.solutis.helpdesk.api_ticket_service.dto.ticket.TicketRegistrationDTO;
 import br.com.solutis.helpdesk.api_ticket_service.dto.ticket.TicketUpdateDTO;
@@ -22,6 +22,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table (name = "tickets")
+@SQLRestriction ("active = true")
 @Getter 
 @AllArgsConstructor 
 @NoArgsConstructor
@@ -63,6 +64,9 @@ public class Ticket {
     @UpdateTimestamp 
     private LocalDateTime updatedAt;
 
+    @Column(name = "active", nullable = false)
+    private boolean active = true;
+
     public Ticket(TicketRegistrationDTO ticketRegistrationDTO) {
         title = ticketRegistrationDTO.title();
         description = ticketRegistrationDTO.description();
@@ -101,4 +105,5 @@ public class Ticket {
             description = ticketUpdateDTO.description();
         }
     }
+
 }
