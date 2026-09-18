@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<StandardError> handleValidationException(ValidationException ex, HttpServletRequest request) {
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<StandardError> handleResourceNotFoundException(ResourceNotFoundException ex, HttpServletRequest request) {
         StandardError error = new StandardError(
                 LocalDateTime.now(),
                 HttpStatus.NOT_FOUND.value(),
