@@ -10,6 +10,7 @@ import br.com.solutis.helpdesk.api_ticket_service.dto.ticket.TicketDetailDTO;
 import br.com.solutis.helpdesk.api_ticket_service.dto.ticket.TicketListDTO;
 import br.com.solutis.helpdesk.api_ticket_service.dto.ticket.TicketRegistrationDTO;
 import br.com.solutis.helpdesk.api_ticket_service.dto.ticket.TicketUpdateDTO;
+import br.com.solutis.helpdesk.api_ticket_service.infra.amqp.TicketEventProducer;
 import br.com.solutis.helpdesk.api_ticket_service.infra.exception.ResourceNotFoundException;
 import br.com.solutis.helpdesk.api_ticket_service.model.Category;
 import br.com.solutis.helpdesk.api_ticket_service.model.Priority;
@@ -31,11 +32,15 @@ public class TicketService {
     @Autowired 
     private TechnicianValidator technicianValidator;
 
+    @Autowired
+    private TicketEventProducer ticketEventProducer;
+
     public TicketDetailDTO createTicket(TicketRegistrationDTO ticketRegistrationDTO){
         if(!customerValidator.userExist(ticketRegistrationDTO.customerId()))
             throw new IllegalArgumentException("This user can not be assigned as a customer");
         var newTicket = new Ticket(ticketRegistrationDTO);
         ticketRepository.save(newTicket);
+        ticketEventProducer.ticketCreatedEvent(newTicket);
         return new TicketDetailDTO(newTicket);
     }
 
@@ -43,8 +48,11 @@ public class TicketService {
         var toUpdateTicket = ticketRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
         if(ticketDto.status() != null && toUpdateTicket.isClose())
             throw new IllegalArgumentException("It is not possible change status for a closed ticket.");
+        var lastStatus = toUpdateTicket.getStatus();
         toUpdateTicket.updateTicket(ticketDto);
         var updatedTicket = ticketRepository.save(toUpdateTicket);
+        if (ticketDto.status() != null)
+            ticketEventProducer.ticketStatusChangedEvent(updatedTicket, lastStatus);
         return new TicketDetailDTO(updatedTicket);
     }
 
@@ -56,13 +64,16 @@ public class TicketService {
             throw new IllegalArgumentException("It is not possible assign a technician for a closed ticket.");
         toUpdateTicket.assignTechnician(assignTechnicianDTO);
         var updatedTicket = ticketRepository.save(toUpdateTicket);
+        ticketEventProducer.ticketAssignedEvent(updatedTicket);
         return new TicketDetailDTO(updatedTicket);
     }
 
     public TicketDetailDTO closeTicket(Long id){
         var toCloseTicket = ticketRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
+        var lastStatus = toCloseTicket.getStatus();
         toCloseTicket.closeTicket();
         var closedTicket = ticketRepository.save(toCloseTicket);
+        ticketEventProducer.ticketStatusChangedEvent(closedTicket, lastStatus);
         return new TicketDetailDTO(closedTicket);
     }
 
@@ -94,9 +105,10 @@ public class TicketService {
     public void deleteTicket(Long ticketId) {
         var toDeleteTicket = ticketRepository.findById(ticketId).orElseThrow(() -> new ResourceNotFoundException("Ticket not founded"));
         toDeleteTicket.deleteTicket();
-        if(!toDeleteTicket.isClose())
-            toDeleteTicket.closeTicket();
+        var lastStatus = toDeleteTicket.getStatus();
+        toDeleteTicket.closeTicket();
         ticketRepository.save(toDeleteTicket);
+        ticketEventProducer.ticketStatusChangedEvent(toDeleteTicket, lastStatus);
     }
 
 }
