@@ -112,5 +112,18 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
     }
+
+    @ExceptionHandler (FeignException.ServiceUnavailable.class)
+    public ResponseEntity<StandardError> handleFeignServiceUnavailableException(FeignException.ServiceUnavailable ex, HttpServletRequest request){
+        StandardError error = new StandardError(
+            LocalDateTime.now(),
+            HttpStatus.SERVICE_UNAVAILABLE.value(),
+            "Service Unavailable",
+            ex.getMessage(),
+            request.getRequestURI(),
+            null
+        );
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
+    }
 }
 
