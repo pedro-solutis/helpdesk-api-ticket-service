@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
 public class TicketAMQPConfiguration {
 
     
-    public static final String EXCHANGE_NAME = "ticket.events.exchange";
+    public static final String EXCHANGE_NAME = "ticket.exchange";
 
     @Bean
     public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
