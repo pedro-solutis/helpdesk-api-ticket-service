@@ -3,6 +3,7 @@ package br.com.solutis.helpdesk.api_ticket_service.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -53,7 +55,9 @@ public class TicketControllerTest {
 
     @BeforeEach
     void setUp() {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
+                .apply(springSecurity())
+                .build();
     }
 
     private TicketDetailDTO createMockTicketDetail() {
@@ -61,6 +65,7 @@ public class TicketControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "CLIENT")
     @DisplayName("Should return 201 Created when creating a valid ticket")
     void testCreateTicket() throws Exception {
         TicketRegistrationDTO dto = new TicketRegistrationDTO("Issue with VPN", "Cannot connect to VPN", "NETWORK", "HIGH", 10L);
@@ -77,6 +82,19 @@ public class TicketControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
+    @DisplayName("Should return 403 Forbidden when creating a ticket with invalid role")
+    void testCreateTicketForbidden() throws Exception {
+        TicketRegistrationDTO dto = new TicketRegistrationDTO("Issue with VPN", "Cannot connect to VPN", "NETWORK", "HIGH", 10L);
+
+        mockMvc.perform(post("/tickets")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "TECHNICIAN")
     @DisplayName("Should return 200 OK when updating a ticket")
     void testUpdateTicket() throws Exception {
         TicketUpdateDTO dto = new TicketUpdateDTO("HIGH", "NETWORK", "Updated description", "IN_PROGRESS");
@@ -91,6 +109,19 @@ public class TicketControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
+    @DisplayName("Should return 403 Forbidden when updating a ticket with invalid role")
+    void testUpdateTicketForbidden() throws Exception {
+        TicketUpdateDTO dto = new TicketUpdateDTO("HIGH", "NETWORK", "Updated description", "IN_PROGRESS");
+
+        mockMvc.perform(put("/tickets/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Should return 200 OK when assigning technician")
     void testAssignTechnician() throws Exception {
         AssignTechnicianDTO dto = new AssignTechnicianDTO(20L);
@@ -105,6 +136,19 @@ public class TicketControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "CLIENT")
+    @DisplayName("Should return 403 Forbidden when assigning technician with invalid role")
+    void testAssignTechnicianForbidden() throws Exception {
+        AssignTechnicianDTO dto = new AssignTechnicianDTO(20L);
+
+        mockMvc.perform(patch("/tickets/technician/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "TECHNICIAN")
     @DisplayName("Should return 200 OK when closing ticket")
     void testCloseTicket() throws Exception {
         TicketDetailDTO detailDto = createMockTicketDetail();
@@ -115,6 +159,15 @@ public class TicketControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "CLIENT")
+    @DisplayName("Should return 403 Forbidden when closing ticket with invalid role")
+    void testCloseTicketForbidden() throws Exception {
+        mockMvc.perform(patch("/tickets/1"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "CLIENT")
     @DisplayName("Should return 200 OK and list tickets by customer")
     void testSearchTicketByCustomerId() throws Exception {
         when(ticketService.getAllTicketByCustomerId(eq(10L), any())).thenReturn(new PageImpl<>(List.of()));
@@ -123,6 +176,15 @@ public class TicketControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "TECHNICIAN")
+    @DisplayName("Should return 403 Forbidden when listing tickets by customer with invalid role")
+    void testSearchTicketByCustomerIdForbidden() throws Exception {
+        mockMvc.perform(get("/tickets/customer/10"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Should return 200 OK and all tickets")
     void testGetAllTickets() throws Exception {
         when(ticketService.getAllTickets(any())).thenReturn(new PageImpl<>(List.of()));
@@ -131,6 +193,15 @@ public class TicketControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "CLIENT")
+    @DisplayName("Should return 403 Forbidden when getting all tickets with invalid role")
+    void testGetAllTicketsForbidden() throws Exception {
+        mockMvc.perform(get("/tickets"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "CLIENT")
     @DisplayName("Should return 200 OK when finding by ID")
     void testGetTicketById() throws Exception {
         TicketDetailDTO detailDto = createMockTicketDetail();
@@ -142,6 +213,7 @@ public class TicketControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "TECHNICIAN")
     @DisplayName("Should return 200 OK when searching by title")
     void testSearchTicketByTitle() throws Exception {
         when(ticketService.searchTicketByTitle(eq("VPN"), any())).thenReturn(new PageImpl<>(List.of()));
@@ -150,6 +222,7 @@ public class TicketControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Should return 200 OK when filtering tickets")
     void testFilterTickets() throws Exception {
         when(ticketService.filterTickets(eq(Status.OPEN), eq(Category.NETWORK), eq(Priority.HIGH), any()))
@@ -162,6 +235,7 @@ public class TicketControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Should return 204 No Content when deleting ticket")
     void testDeleteTicket() throws Exception {
         mockMvc.perform(delete("/tickets/1"))
@@ -169,7 +243,8 @@ public class TicketControllerTest {
     }
 
     @Test
-    @DisplayName("Should return 400 Bad Request when creating ticket with invalid data (validation error)")
+    @WithMockUser(roles = "CLIENT")
+    @DisplayName("Should return 400 Bad Request when creating ticket with invalid data")
     void testCreateTicket_WithInvalidData_ShouldReturn400() throws Exception {
         TicketRegistrationDTO invalidDto = new TicketRegistrationDTO("", "Description", "NETWORK", "HIGH", null);
 
@@ -181,6 +256,7 @@ public class TicketControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "CLIENT")
     @DisplayName("Should return 400 Bad Request when customer does not exist or invalid role")
     void testCreateTicket_WhenCustomerInvalid_ShouldReturn400() throws Exception {
         TicketRegistrationDTO dto = new TicketRegistrationDTO("Title", "Description", "NETWORK", "HIGH", 10L);
@@ -196,6 +272,7 @@ public class TicketControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "CLIENT")
     @DisplayName("Should return 404 Not Found when ticket ID does not exist")
     void testGetTicketById_WhenTicketDoesNotExist_ShouldReturn404() throws Exception {
         when(ticketService.getTicketById(99L)).thenThrow(new br.com.solutis.helpdesk.api_ticket_service.infra.exception.ResourceNotFoundException("Ticket not found"));
@@ -207,6 +284,7 @@ public class TicketControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Should return 400 Bad Request when assigning technician to a closed ticket")
     void testAssignTechnician_WhenTicketIsClosed_ShouldReturn400() throws Exception {
         AssignTechnicianDTO dto = new AssignTechnicianDTO(20L);
