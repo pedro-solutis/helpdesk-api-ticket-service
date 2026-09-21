@@ -14,7 +14,7 @@ public class CustomerValidator extends TicketUserValidator{
         try {
             ResponseEntity<UserClientDTO> response = userClient.validateUserExists(userId);
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                return "CUSTOMER".equalsIgnoreCase(response.getBody().role());
+                return "CLIENT".equalsIgnoreCase(response.getBody().role());
             }
             return false;
         } catch (FeignException.NotFound e) {
