@@ -26,3 +26,7 @@ api:
   security:
     jwt:
       secret: ${JWT_SECRET:mySecretKey}
+
+springdoc:
+  servers:
+    - url: http://localhost:8080/api
