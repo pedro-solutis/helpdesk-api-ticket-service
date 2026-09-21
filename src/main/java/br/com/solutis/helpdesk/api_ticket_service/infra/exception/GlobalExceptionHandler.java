@@ -6,6 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 
 import feign.FeignException;
 
@@ -72,6 +75,45 @@ public class GlobalExceptionHandler {
                 validationErrors
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<StandardError> handleAccessDeniedException(AccessDeniedException ex, HttpServletRequest request){
+        StandardError error = new StandardError(
+            LocalDateTime.now(),
+            HttpStatus.FORBIDDEN.value(),
+            "Access Denied",
+            ex.getMessage(),
+            request.getRequestURI(),
+            null
+        );
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<StandardError> handleAuthenticationException(AuthenticationException ex, HttpServletRequest request){
+        StandardError error = new StandardError(
+            LocalDateTime.now(),
+            HttpStatus.UNAUTHORIZED.value(),
+            "Authentication Failed",
+            ex.getMessage(),
+            request.getRequestURI(),
+            null
+        );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<StandardError> handleBadCredentialException(BadCredentialsException ex, HttpServletRequest request){
+        StandardError error = new StandardError(
+            LocalDateTime.now(),
+            HttpStatus.UNAUTHORIZED.value(),
+            "Bad Credentials",
+            ex.getMessage(),
+            request.getRequestURI(),
+            null
+        );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
 
     @ExceptionHandler(Exception.class)
