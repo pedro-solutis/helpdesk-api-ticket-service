@@ -4,7 +4,6 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
 import br.com.solutis.helpdesk.api_ticket_service.dto.event.TicketEventDTO;
-import br.com.solutis.helpdesk.api_ticket_service.dto.event.TicketStatusDTO;
 import br.com.solutis.helpdesk.api_ticket_service.model.Status;
 import br.com.solutis.helpdesk.api_ticket_service.model.Ticket;
 
@@ -18,44 +17,47 @@ public class TicketEventProducer {
     }
 
     public void ticketCreatedEvent(Ticket ticket) {
-        TicketEventDTO event = createEvent(ticket, "ticketCreated");
+        TicketEventDTO event = createEventCreatedTicket(ticket, "ticketCreated");
         rabbitTemplate.convertAndSend(TicketAMQPConfiguration.EXCHANGE_NAME, "ticket.created", event);
     }
 
     public void ticketAssignedEvent(Ticket ticket) {
-        TicketEventDTO event = createEvent(ticket, "ticketAssigned");
+        TicketEventDTO event = createEventAssignedTicket(ticket, "ticketAssigned");
         rabbitTemplate.convertAndSend(TicketAMQPConfiguration.EXCHANGE_NAME, "ticket.assigned", event);
     }
 
     public void ticketStatusChangedEvent(Ticket ticket, Status lastStatus) {
-        TicketStatusDTO event = createEvent(ticket, lastStatus, "ticketStatusChanged");
+        TicketEventDTO event = createEventStatusChangedTicket(ticket, lastStatus, "ticketStatusChanged");
         rabbitTemplate.convertAndSend(TicketAMQPConfiguration.EXCHANGE_NAME, "ticket.status.changed", event);
     }
 
-    private TicketEventDTO createEvent(Ticket ticket, String eventType) {
+    private TicketEventDTO createEventCreatedTicket(Ticket ticket, String eventType) {
         return new TicketEventDTO(
             ticket.getId(),
-            ticket.getTitle(),
-            ticket.getDescription(),
-            ticket.getStatus(),
             ticket.getCustomerId(),
-            ticket.getTechnicianId(),
-            ticket.getCreatedAt(),
-            eventType
+            eventType,
+            ticket.getTitle(),
+            "Ticket: " + ticket.getTitle() + " was created by user " + ticket.getTechnicianId()
         );
     }
 
-    private TicketStatusDTO createEvent(Ticket ticket, Status lastStatus, String eventType){
-        return new TicketStatusDTO(
+    private TicketEventDTO createEventAssignedTicket(Ticket ticket, String eventType) {
+        return new TicketEventDTO(
             ticket.getId(),
-            ticket.getTitle(),
-            ticket.getDescription(),
-            lastStatus,
-            ticket.getStatus(),
-            ticket.getCustomerId(),
             ticket.getTechnicianId(),
-            ticket.getCreatedAt(),
-            eventType
+            eventType,
+            ticket.getTitle(),
+            "Ticket: " + ticket.getTitle() + " was assigned to user " + ticket.getTechnicianId()
+        );
+    }
+
+    private TicketEventDTO createEventStatusChangedTicket(Ticket ticket, Status lastStatus,String eventType) {
+        return new TicketEventDTO(
+            ticket.getId(),
+            ticket.getCustomerId(),
+            eventType,
+            ticket.getTitle(),
+            "Ticket: " + ticket.getTitle() + " status changed from " + lastStatus + " to "+ ticket.getStatus()
         );
     }
 }
