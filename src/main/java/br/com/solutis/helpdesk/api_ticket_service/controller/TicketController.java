@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -35,6 +36,7 @@ public class TicketController {
     @Autowired 
     private TicketService ticketService;
 
+    @PreAuthorize (value = "hasRole('CLIENT')")
     @PostMapping 
     @Transactional 
     public ResponseEntity<TicketDetailDTO> createTicket(@RequestBody @Valid TicketRegistrationDTO ticketRegistrationDTO, UriComponentsBuilder uriBuilder){
@@ -43,6 +45,7 @@ public class TicketController {
         return ResponseEntity.created(uri).body(createdTicket);
     }
 
+    @PreAuthorize (value = "hasAnyRole('CLIENT', 'TECHNICIAN')")
     @PutMapping("/{id}")
     @Transactional 
     public ResponseEntity<TicketDetailDTO> updateTicket(@PathVariable Long id, @RequestBody @Valid TicketUpdateDTO ticket){
@@ -50,6 +53,7 @@ public class TicketController {
         return ResponseEntity.ok(updatedTicket);
     }
 
+    @PreAuthorize (value = "hasRole('ADMIN')")
     @PatchMapping("/technician/{id}")
     @Transactional 
     public ResponseEntity<TicketDetailDTO> assignTechnician(@PathVariable("id") Long ticketId, @RequestBody @Valid AssignTechnicianDTO assignTechnician){
@@ -57,6 +61,7 @@ public class TicketController {
         return ResponseEntity.ok(updatedTechnician);
     }
 
+    @PreAuthorize (value = "hasRole('TECHNICIAN')")
     @PatchMapping("/{id}")
     @Transactional 
     public ResponseEntity<TicketDetailDTO> closeTicket(@PathVariable("id") Long ticketId){
@@ -64,30 +69,35 @@ public class TicketController {
         return ResponseEntity.ok(ticket);
     }
 
+    @PreAuthorize (value = "hasAnyRole('CLIENT', 'ADMIN')")
     @GetMapping("/customer/{id}")
     public ResponseEntity<Page<TicketListDTO>> searchTicketByCustomerId(@PathVariable("id") Long customerId, Pageable pageable){
         var tickets = ticketService.getAllTicketByCustomerId(customerId, pageable);
         return ResponseEntity.ok(tickets);
     }
 
+    @PreAuthorize (value = "hasRole('ADMIN')")
     @GetMapping 
     public ResponseEntity<Page<TicketListDTO>> getAllTickets(@PageableDefault(page=0, size = 10, sort = "createdAt") Pageable pageable){
         var tickets = ticketService.getAllTickets(pageable);
         return ResponseEntity.ok(tickets);
     }
 
+    @PreAuthorize (value = "hasAnyRole('CLIENT', 'TECHNICIAN', 'ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<TicketDetailDTO> getTicketById(@PathVariable Long id){
         var ticket = ticketService.getTicketById(id);
         return ResponseEntity.ok(ticket);
     }
 
+    @PreAuthorize (value = "hasAnyRole('CLIENT', 'TECHNICIAN', 'ADMIN')")
     @GetMapping ("/search")
     public ResponseEntity<Page<TicketListDTO>> searchTicketByTitle(@RequestParam @NotBlank String title, Pageable pageable){
         var ticket = ticketService.searchTicketByTitle(title, pageable);
         return ResponseEntity.ok(ticket);
     }
 
+    @PreAuthorize (value = "hasAnyRole('CLIENT', 'TECHNICIAN', 'ADMIN')")
     @GetMapping("/filter")
     public ResponseEntity<Page<TicketListDTO>> filterTickets(
         @RequestParam(required = false) Status status,
@@ -98,6 +108,7 @@ public class TicketController {
         return  ResponseEntity.ok(ticket);
     }
 
+    @PreAuthorize (value = "hasAnyRole('CLIENT', 'TECHNICIAN', 'ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteTicket(@PathVariable("id") Long ticketId){
         ticketService.deleteTicket(ticketId);
