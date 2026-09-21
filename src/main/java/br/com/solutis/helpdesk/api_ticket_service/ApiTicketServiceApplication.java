@@ -7,7 +7,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.servers.Server;
 
-@OpenAPIDefinition(servers = { @Server(url = "http://localhost:8080/api") })
+@OpenAPIDefinition(servers = { @Server(url = "http://localhost:8080/api"), @Server(url = "http://localhost:8082") })
 @SpringBootApplication
 @EnableFeignClients 
 public class ApiTicketServiceApplication {
