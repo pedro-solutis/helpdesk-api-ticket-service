@@ -38,8 +38,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>{
 
     long countByPriorityEquals(Priority priority);
 
-    long countByTechnicianIdAndPriorityEquals(Priority priority);
+    long countByTechnicianIdAndPriorityEquals(Long userId, Priority priority);
 
-    long countByCustomerIdAndPriorityEquals(Priority priority);
+    long countByCustomerIdAndPriorityEquals(Long userId, Priority priority);
 
 }
