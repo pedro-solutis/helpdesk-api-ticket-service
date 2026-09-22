@@ -86,6 +86,11 @@ public class TicketService {
         return tickets.map(TicketListDTO::new);
     }
 
+    public Page<TicketListDTO> getAllTicketByTechnicianId(Long technicianId, Pageable pageable) {
+       var tickets = ticketRepository.findAllByTechnicianId(technicianId, pageable);
+       return tickets.map(TicketListDTO::new);
+    }
+
     public Page<TicketListDTO> getAllTickets(Pageable pageable){
         var tickets = ticketRepository.findAll(pageable);
         return tickets.map(TicketListDTO::new);

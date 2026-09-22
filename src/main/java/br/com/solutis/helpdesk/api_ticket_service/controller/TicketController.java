@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import br.com.solutis.helpdesk.api_ticket_service.dto.ticket.DashboardMetricsDTO;
 import br.com.solutis.helpdesk.api_ticket_service.dto.ticket.*;
 import br.com.solutis.helpdesk.api_ticket_service.model.Category;
 import br.com.solutis.helpdesk.api_ticket_service.model.Priority;
@@ -73,8 +72,15 @@ public class TicketController {
 
     @PreAuthorize (value = "hasAnyRole('CLIENT', 'ADMIN')")
     @GetMapping("/customer/{id}")
-    public ResponseEntity<Page<TicketListDTO>> searchTicketByCustomerId(@PathVariable("id") Long customerId, Pageable pageable){
+    public ResponseEntity<Page<TicketListDTO>> getByCustomerId(@PathVariable("id") Long customerId, Pageable pageable){
         var tickets = ticketService.getAllTicketByCustomerId(customerId, pageable);
+        return ResponseEntity.ok(tickets);
+    }
+
+    @PreAuthorize (value = "hasAnyRole('TECHNICIAN', 'ADMIN')")
+    @GetMapping("/technician/{id}")
+    public ResponseEntity<Page<TicketListDTO>> getByTechnicianId(@PathVariable("id") Long technicianId, Pageable pageable){
+        var tickets = ticketService.getAllTicketByTechnicianId(technicianId, pageable);
         return ResponseEntity.ok(tickets);
     }
 
