@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import br.com.solutis.helpdesk.api_ticket_service.dto.ticket.DashboardMetricsDTO;
 import br.com.solutis.helpdesk.api_ticket_service.dto.ticket.*;
 import br.com.solutis.helpdesk.api_ticket_service.model.Category;
 import br.com.solutis.helpdesk.api_ticket_service.model.Priority;
@@ -106,6 +108,15 @@ public class TicketController {
         Pageable pageable){
         var ticket = ticketService.filterTickets(status, category, priority, pageable);
         return  ResponseEntity.ok(ticket);
+    }
+
+    @PreAuthorize (value = "hasAnyRole('CLIENT', 'TECHNICIAN', 'ADMIN')")
+    @GetMapping("/dashboard")
+    public ResponseEntity<DashboardMetricsDTO> getDashboardMetrics(Authentication auth){
+        var userId = (Long) auth.getPrincipal();
+        var userRoles = auth.getAuthorities();
+        var metricsDTO = ticketService.getDashboardMetrics(userId, userRoles);
+        return ResponseEntity.ok(metricsDTO);
     }
 
     @PreAuthorize (value = "hasAnyRole('CLIENT', 'TECHNICIAN', 'ADMIN')")

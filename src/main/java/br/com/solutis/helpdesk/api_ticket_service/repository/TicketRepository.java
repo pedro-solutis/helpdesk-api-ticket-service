@@ -24,4 +24,20 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>{
 
     Page<Ticket> findAllByCustomerId(Long customerId, Pageable pageable);
 
+    long countByStatusEquals(Status open);
+
+    long countByTechnicianId(Long userId);
+
+    long countByTechnicianIdAndStatusEquals(Long userId, Status resolved);
+
+    long countByCustomerId(Long userId);
+
+    long countByCustomerIdAndStatusEquals(Long userId, Status open);
+
+    long countByPriorityEquals(Priority priority);
+
+    long countByTechnicianIdAndPriorityEquals(Priority priority);
+
+    long countByCustomerIdAndPriorityEquals(Priority priority);
+
 }
