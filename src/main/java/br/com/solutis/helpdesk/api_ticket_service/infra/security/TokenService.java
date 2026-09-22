@@ -3,6 +3,9 @@ package br.com.solutis.helpdesk.api_ticket_service.infra.security;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +15,8 @@ public class TokenService {
     @Value("${api.security.jwt.secret}")
     private String jwtSecret;
 
-    private final String ISSUER = "userService";
+    @Value("${api.security.jwt.issuer}")
+    private String ISSUER;
 
     public String validateToken(String token) {
         try {
@@ -25,6 +29,31 @@ public class TokenService {
         } catch (JWTVerificationException exception) {
             return "";
         }
+    }
+
+    public Long getUserId(String token){
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(jwtSecret);
+            return JWT.require(algorithm)
+                    .withIssuer(ISSUER)
+                    .build()
+                    .verify(token)
+                    .getClaim("id")
+                    .asLong();
+        } catch (JWTVerificationException e) {
+            return 0L;
+        }
+    }
+
+    public List<String> getUserRoles(String token) {
+        Algorithm algorithm = Algorithm.HMAC256(jwtSecret);
+        var role = JWT.require(algorithm)
+                .withIssuer(ISSUER)
+                .build()
+                .verify(token)
+                .getClaim("role")
+                .asString();
+        return List.of(role);
     }
 }
 

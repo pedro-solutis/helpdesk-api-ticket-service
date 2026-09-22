@@ -25,7 +25,8 @@ spring:
 api:
   security:
     jwt:
-      secret: ${JWT_SECRET:mySecretKey}
+      secret: ${JWT_SECRET:mySuperSecretKey123!}
+      issuer: ${JWT_ISSUER:user-service}
 
 springdoc:
   servers:

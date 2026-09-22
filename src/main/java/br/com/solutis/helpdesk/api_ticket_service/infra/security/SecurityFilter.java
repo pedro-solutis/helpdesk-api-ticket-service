@@ -6,12 +6,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.List;
 
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
@@ -21,13 +22,14 @@ public class SecurityFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        var token = this.recoverToken(request);
+        String token = this.recoverToken(request);
         
         if (token != null) {
-            var subject = tokenService.validateToken(token);
-            
-            if (!subject.isEmpty()) {
-                var authentication = new UsernamePasswordAuthenticationToken(subject, null, Collections.emptyList());
+            String subject = tokenService.validateToken(token);
+            Long userId = tokenService.getUserId(token);
+            List<SimpleGrantedAuthority> userRoles = tokenService.getUserRoles(token).stream().map(role -> new SimpleGrantedAuthority("ROLE_"+role.toUpperCase())).toList();
+            if (!subject.isEmpty() && userId!=0L) {
+                var authentication = new UsernamePasswordAuthenticationToken(userId, null, userRoles);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
@@ -35,7 +37,7 @@ public class SecurityFilter extends OncePerRequestFilter {
     }
 
     private String recoverToken(HttpServletRequest request) {
-        var authHeader = request.getHeader("Authorization");
+        String authHeader = request.getHeader("Authorization");
         if (authHeader == null) return null;
         return authHeader.replace("Bearer ", "");
     }
