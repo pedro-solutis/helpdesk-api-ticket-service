@@ -125,13 +125,13 @@ public class TicketService {
                 open = ticketRepository.countByTechnicianIdAndStatusEquals(userId, Status.OPEN);
                 in_progress = ticketRepository.countByTechnicianIdAndStatusEquals(userId, Status.IN_PROGRESS) + ticketRepository.countByTechnicianIdAndStatusEquals(userId, Status.WAITING);
                 resolved = ticketRepository.countByTechnicianIdAndStatusEquals(userId, Status.RESOLVED) + ticketRepository.countByTechnicianIdAndStatusEquals(userId, Status.CLOSED);
-                critical = ticketRepository.countByTechnicianIdAndPriorityEquals(Priority.CRITICAL);
+                critical = ticketRepository.countByTechnicianIdAndPriorityEquals(userId, Priority.CRITICAL);
             }else{
                 total = ticketRepository.countByCustomerId(userId);
                 open = ticketRepository.countByCustomerIdAndStatusEquals(userId, Status.OPEN);
                 in_progress = ticketRepository.countByCustomerIdAndStatusEquals(userId, Status.IN_PROGRESS) + ticketRepository.countByTechnicianIdAndStatusEquals(userId, Status.WAITING);
                 resolved = ticketRepository.countByCustomerIdAndStatusEquals(userId, Status.RESOLVED) + ticketRepository.countByTechnicianIdAndStatusEquals(userId, Status.CLOSED);
-                critical = ticketRepository.countByCustomerIdAndPriorityEquals(Priority.CRITICAL);
+                critical = ticketRepository.countByCustomerIdAndPriorityEquals(userId, Priority.CRITICAL);
             }
         }
         return new DashboardMetricsDTO(total, open, in_progress, resolved, critical);
