@@ -22,13 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.solutis.helpdesk.api_ticket_service.dto.ticket.*;
-import br.com.solutis.helpdesk.api_ticket_service.model.Category;
-import br.com.solutis.helpdesk.api_ticket_service.model.Priority;
-import br.com.solutis.helpdesk.api_ticket_service.model.Status;
 import br.com.solutis.helpdesk.api_ticket_service.service.TicketService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 
 @RestController
 @RequestMapping("/tickets")
@@ -70,24 +66,17 @@ public class TicketController {
         return ResponseEntity.ok(ticket);
     }
 
-    @PreAuthorize (value = "hasAnyRole('CLIENT', 'ADMIN')")
-    @GetMapping("/customer/{id}")
-    public ResponseEntity<Page<TicketListDTO>> getByCustomerId(@PathVariable("id") Long customerId, Pageable pageable){
-        var tickets = ticketService.getAllTicketByCustomerId(customerId, pageable);
-        return ResponseEntity.ok(tickets);
-    }
-
-    @PreAuthorize (value = "hasAnyRole('TECHNICIAN', 'ADMIN')")
-    @GetMapping("/technician/{id}")
-    public ResponseEntity<Page<TicketListDTO>> getByTechnicianId(@PathVariable("id") Long technicianId, Pageable pageable){
-        var tickets = ticketService.getAllTicketByTechnicianId(technicianId, pageable);
-        return ResponseEntity.ok(tickets);
-    }
-
-    @PreAuthorize (value = "hasRole('ADMIN')")
     @GetMapping 
-    public ResponseEntity<Page<TicketListDTO>> getAllTickets(@PageableDefault(page=0, size = 10, sort = "createdAt") Pageable pageable){
-        var tickets = ticketService.getAllTickets(pageable);
+    public ResponseEntity<Page<TicketListDTO>> getAllTickets(
+        @RequestParam (required = false) Long customerId,
+        @RequestParam (required = false) Long technicianId,
+        @RequestParam (required = false) String title,
+        @RequestParam (required = false) String status,
+        @RequestParam (required = false) String category,
+        @RequestParam (required = false) String priority,
+        @PageableDefault(page=0, size = 10, sort = "createdAt"  
+        ) Pageable pageable){
+        var tickets = ticketService.getAllTickets(customerId, technicianId, title, status, category, priority, pageable);
         return ResponseEntity.ok(tickets);
     }
 
@@ -96,24 +85,6 @@ public class TicketController {
     public ResponseEntity<TicketDetailDTO> getTicketById(@PathVariable Long id){
         var ticket = ticketService.getTicketById(id);
         return ResponseEntity.ok(ticket);
-    }
-
-    @PreAuthorize (value = "hasAnyRole('CLIENT', 'TECHNICIAN', 'ADMIN')")
-    @GetMapping ("/search")
-    public ResponseEntity<Page<TicketListDTO>> searchTicketByTitle(@RequestParam @NotBlank String title, Pageable pageable){
-        var ticket = ticketService.searchTicketByTitle(title, pageable);
-        return ResponseEntity.ok(ticket);
-    }
-
-    @PreAuthorize (value = "hasAnyRole('CLIENT', 'TECHNICIAN', 'ADMIN')")
-    @GetMapping("/filter")
-    public ResponseEntity<Page<TicketListDTO>> filterTickets(
-        @RequestParam(required = false) Status status,
-        @RequestParam(required = false) Category category,
-        @RequestParam(required = false) Priority priority,
-        Pageable pageable){
-        var ticket = ticketService.filterTickets(status, category, priority, pageable);
-        return  ResponseEntity.ok(ticket);
     }
 
     @PreAuthorize (value = "hasAnyRole('CLIENT', 'TECHNICIAN', 'ADMIN')")

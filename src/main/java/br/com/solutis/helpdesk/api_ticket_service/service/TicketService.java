@@ -7,7 +7,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
-
 import br.com.solutis.helpdesk.api_ticket_service.dto.ticket.DashboardMetricsDTO;
 import br.com.solutis.helpdesk.api_ticket_service.dto.ticket.AssignTechnicianDTO;
 import br.com.solutis.helpdesk.api_ticket_service.dto.ticket.TicketDetailDTO;
@@ -81,34 +80,28 @@ public class TicketService {
         return new TicketDetailDTO(closedTicket);
     }
 
-    public Page<TicketListDTO> getAllTicketByCustomerId(Long customerId, Pageable pageable){
-        var tickets = ticketRepository.findAllByCustomerId(customerId, pageable);
-        return tickets.map(TicketListDTO::new);
-    }
-
-    public Page<TicketListDTO> getAllTicketByTechnicianId(Long technicianId, Pageable pageable) {
-       var tickets = ticketRepository.findAllByTechnicianId(technicianId, pageable);
-       return tickets.map(TicketListDTO::new);
-    }
-
-    public Page<TicketListDTO> getAllTickets(Pageable pageable){
-        var tickets = ticketRepository.findAll(pageable);
+    public Page<TicketListDTO> getAllTickets(
+        Long customerId,
+        Long technicianId,
+        String title,
+        String status,
+        String category,
+        String priority,
+        Pageable pageable){
+        var tickets = ticketRepository.filterTickets(
+            customerId,
+            technicianId,
+            title != null ? title.toUpperCase() : null, 
+            status != null ? Status.valueOf(status.toUpperCase()) : null,
+            category != null ? Category.valueOf(category.toUpperCase()) : null,
+            priority != null ? Priority.valueOf(priority.toUpperCase()) : null,
+            pageable);
         return tickets.map(TicketListDTO::new);
     }
 
     public TicketDetailDTO getTicketById(Long id){
         var ticket = ticketRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
         return new TicketDetailDTO(ticket);
-    }
-
-    public Page<TicketListDTO> searchTicketByTitle(String title, Pageable pageable){
-        var tickets = ticketRepository.findByTitleContainingIgnoreCase(title, pageable);
-        return tickets.map(TicketListDTO::new);
-    }
-
-    public Page<TicketListDTO> filterTickets(Status status, Category category, Priority priority, Pageable pageable){
-        var tickets = ticketRepository.filterTickets(status, category, priority, pageable);
-        return tickets.map(TicketListDTO::new);
     }
 
     public DashboardMetricsDTO getDashboardMetrics(Long userId, Collection<? extends GrantedAuthority> userRoles) {

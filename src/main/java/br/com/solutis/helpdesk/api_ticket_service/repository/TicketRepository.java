@@ -16,15 +16,21 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>{
 
     @Query(
         "SELECT t FROM Ticket t WHERE " + 
+        "(:customerId IS NULL OR t.customerId = :customerId) AND " +
+        "(:technicianId IS NULL OR t.technicianId = :technicianId) AND " +
+        "(:title IS NULL OR UPPER(t.title) LIKE %:title%) AND " +
         "(:status IS NULL OR t.status = :status) AND " +
         "(:category IS NULL OR t.category = :category) AND " +
         "(:priority IS NULL OR t.priority = :priority)"
     )
-    Page<Ticket> filterTickets(Status status, Category category, Priority priority, Pageable pageable);
-
-    Page<Ticket> findAllByCustomerId(Long customerId, Pageable pageable);
-
-    Page<Ticket> findAllByTechnicianId(Long technicianId, Pageable pageable);
+    Page<Ticket> filterTickets(
+        Long customerId,
+        Long technicianId,
+        String title,
+        Status status,
+        Category category,
+        Priority priority,
+        Pageable pageable);
 
     long countByStatusEquals(Status open);
 
