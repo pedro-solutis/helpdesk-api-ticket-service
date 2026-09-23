@@ -65,7 +65,7 @@ public class TicketControllerTest {
     }
 
     private TicketDetailDTO createMockTicketDetail() {
-        return new TicketDetailDTO(1L, "Issue with VPN", "Cannot connect to VPN", Status.OPEN, Category.NETWORK, Priority.HIGH, 10L, null, LocalDateTime.now(), LocalDateTime.now());
+        return new TicketDetailDTO(1L, "Issue with VPN", "Cannot connect to VPN", Status.OPEN, Category.NETWORK, Priority.HIGH, 10L, null, LocalDateTime.now(), LocalDateTime.now(), true);
     }
 
     @Test
