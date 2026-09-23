@@ -17,7 +17,9 @@ public record TicketDetailDTO(
     Long customerId,
     Long technicianId,
     LocalDateTime createdAt,
-    LocalDateTime updatedAt) {
+    LocalDateTime updatedAt,
+    boolean active    
+) {
 
     public TicketDetailDTO(Ticket newTicket) {
         this(
@@ -30,7 +32,8 @@ public record TicketDetailDTO(
             newTicket.getCustomerId(),
             newTicket.getTechnicianId(),
             newTicket.getCreatedAt(),
-            newTicket.getUpdatedAt()
+            newTicket.getUpdatedAt(),
+            newTicket.isActive()
         );
     }
 
