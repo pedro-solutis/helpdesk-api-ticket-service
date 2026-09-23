@@ -68,6 +68,7 @@ public class TicketService {
         toUpdateTicket.assignTechnician(assignTechnicianDTO);
         var updatedTicket = ticketRepository.save(toUpdateTicket);
         ticketEventProducer.ticketAssignedEvent(updatedTicket);
+        ticketEventProducer.ticketStatusChangedEvent(updatedTicket, Status.OPEN);
         return new TicketDetailDTO(updatedTicket);
     }
 
