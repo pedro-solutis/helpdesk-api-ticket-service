@@ -23,7 +23,7 @@ public class UserClientTest {
         
         assertNotNull(feignClient, "UserClient should be annotated with @FeignClient");
         assertEquals("user-service", feignClient.name(), "FeignClient name should be 'user-service'");
-        assertEquals("${user.service.url:http://localhost:8081}", feignClient.url(), "FeignClient url should use the property placeholder");
+        assertEquals("${USER_SERVICE_URL:http://localhost:8081}", feignClient.url(), "FeignClient url should use the property placeholder");
     }
 
     @Test
