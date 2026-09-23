@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import br.com.solutis.helpdesk.api_ticket_service.dto.ticket.DashboardMetricsDTO;
 import br.com.solutis.helpdesk.api_ticket_service.dto.ticket.AssignTechnicianDTO;
@@ -110,14 +109,12 @@ public class TicketService {
 
     public DashboardMetricsDTO getDashboardMetrics(Authentication auth) {
         long total = 0L, open = 0L, in_progress = 0L, resolved = 0L, critical = 0L;
-        Long userId = null;
-        for(GrantedAuthority role:auth.getAuthorities()){
-            if(!role.toString().equalsIgnoreCase("ADMIN")){
-                userId = (Long) auth.getPrincipal();
-            }
-        }
+        
+        boolean isAdmin = auth.getAuthorities().stream()
+                .anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
+        Long userId = isAdmin ? null : (Long) auth.getPrincipal();
         Object[] metrics = ticketRepository.getTicketMetrics(userId);
-        if (metrics.length > 0 && metrics != null){
+        if (metrics != null && metrics.length > 0){
             Object[] row = (metrics[0] instanceof Object[]) ? (Object[]) metrics[0] : metrics;
             total = ((Number) row[0]).longValue();
             open = ((Number) row[1]).longValue();
