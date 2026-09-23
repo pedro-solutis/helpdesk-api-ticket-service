@@ -63,7 +63,7 @@ public class TicketService {
         if (!technicianValidator.userExist(assignTechnicianDTO.technicianId()))
             throw new IllegalArgumentException("This user can not be assigned as a technician");
         var toUpdateTicket = ticketRepository.findById(ticketId).orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
-        if(toUpdateTicket.isClose())
+        if (toUpdateTicket.isClose())
             throw new IllegalArgumentException("It is not possible assign a technician for a closed ticket.");
         toUpdateTicket.assignTechnician(assignTechnicianDTO);
         var updatedTicket = ticketRepository.save(toUpdateTicket);
@@ -73,7 +73,11 @@ public class TicketService {
 
     public TicketDetailDTO closeTicket(Long id){
         var toCloseTicket = ticketRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
+        if (toCloseTicket.getStatus() != Status.RESOLVED)
+            throw new IllegalArgumentException("Its not possible close a ticket that is not resolved");
         var lastStatus = toCloseTicket.getStatus();
+        if (toCloseTicket.getTechnicianId() == null )
+            throw new IllegalArgumentException("Its not possible close a ticket with no technician assigned");
         toCloseTicket.closeTicket();
         var closedTicket = ticketRepository.save(toCloseTicket);
         ticketEventProducer.ticketStatusChangedEvent(closedTicket, lastStatus);
