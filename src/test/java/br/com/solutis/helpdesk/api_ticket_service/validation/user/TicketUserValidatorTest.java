@@ -33,13 +33,11 @@ public class TicketUserValidatorTest {
         return new UserClientDTO(1L, "User Name", "user@test.com", role, true, java.time.LocalDateTime.now());
     }
 
-    // --- CustomerValidator Tests ---
-
     @Test
-    @DisplayName("CustomerValidator should return true when user is CUSTOMER")
+    @DisplayName("CustomerValidator should return true when user is CLIENT")
     void testCustomerValidator_UserIsCustomer_ReturnsTrue() {
         when(userClient.validateUserExists(1L))
-                .thenReturn(ResponseEntity.ok(createUserDto("CUSTOMER")));
+                .thenReturn(ResponseEntity.ok(createUserDto("CLIENT")));
 
         boolean result = customerValidator.userExist(1L);
 
@@ -47,10 +45,10 @@ public class TicketUserValidatorTest {
     }
 
     @Test
-    @DisplayName("CustomerValidator should return true when user is customer (case insensitive)")
+    @DisplayName("CustomerValidator should return true when user is client (case insensitive)")
     void testCustomerValidator_UserIsCustomerLowercase_ReturnsTrue() {
         when(userClient.validateUserExists(1L))
-                .thenReturn(ResponseEntity.ok(createUserDto("customer")));
+                .thenReturn(ResponseEntity.ok(createUserDto("client")));
 
         boolean result = customerValidator.userExist(1L);
 
