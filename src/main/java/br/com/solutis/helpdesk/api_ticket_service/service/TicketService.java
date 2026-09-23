@@ -1,10 +1,9 @@
 package br.com.solutis.helpdesk.api_ticket_service.service;
 
-import java.util.Collection;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import br.com.solutis.helpdesk.api_ticket_service.dto.ticket.DashboardMetricsDTO;
@@ -109,28 +108,22 @@ public class TicketService {
         return new TicketDetailDTO(ticket);
     }
 
-    public DashboardMetricsDTO getDashboardMetrics(Long userId, Collection<? extends GrantedAuthority> userRoles) {
+    public DashboardMetricsDTO getDashboardMetrics(Authentication auth) {
         long total = 0L, open = 0L, in_progress = 0L, resolved = 0L, critical = 0L;
-        for (GrantedAuthority role : userRoles) {
-            if (role.toString().equalsIgnoreCase("ROLE_ADMIN")) {
-                total = ticketRepository.count();
-                open = ticketRepository.countByStatusEquals(Status.OPEN);
-                in_progress = ticketRepository.countByStatusEquals(Status.IN_PROGRESS) + ticketRepository.countByStatusEquals(Status.WAITING);
-                resolved = ticketRepository.countByStatusEquals(Status.RESOLVED) + ticketRepository.countByStatusEquals(Status.CLOSED);
-                critical = ticketRepository.countByPriorityEquals(Priority.CRITICAL);
-            }else if (role.toString().equalsIgnoreCase("ROLE_TECHNICIAN")) {
-                total = ticketRepository.countByTechnicianId(userId);
-                open = ticketRepository.countByTechnicianIdAndStatusEquals(userId, Status.OPEN);
-                in_progress = ticketRepository.countByTechnicianIdAndStatusEquals(userId, Status.IN_PROGRESS) + ticketRepository.countByTechnicianIdAndStatusEquals(userId, Status.WAITING);
-                resolved = ticketRepository.countByTechnicianIdAndStatusEquals(userId, Status.RESOLVED) + ticketRepository.countByTechnicianIdAndStatusEquals(userId, Status.CLOSED);
-                critical = ticketRepository.countByTechnicianIdAndPriorityEquals(userId, Priority.CRITICAL);
-            }else{
-                total = ticketRepository.countByCustomerId(userId);
-                open = ticketRepository.countByCustomerIdAndStatusEquals(userId, Status.OPEN);
-                in_progress = ticketRepository.countByCustomerIdAndStatusEquals(userId, Status.IN_PROGRESS) + ticketRepository.countByTechnicianIdAndStatusEquals(userId, Status.WAITING);
-                resolved = ticketRepository.countByCustomerIdAndStatusEquals(userId, Status.RESOLVED) + ticketRepository.countByTechnicianIdAndStatusEquals(userId, Status.CLOSED);
-                critical = ticketRepository.countByCustomerIdAndPriorityEquals(userId, Priority.CRITICAL);
+        Long userId = null;
+        for(GrantedAuthority role:auth.getAuthorities()){
+            if(!role.toString().equalsIgnoreCase("ADMIN")){
+                userId = (Long) auth.getPrincipal();
             }
+        }
+        Object[] metrics = ticketRepository.getTicketMetrics(userId);
+        if (metrics.length > 0 && metrics != null){
+            Object[] row = (metrics[0] instanceof Object[]) ? (Object[]) metrics[0] : metrics;
+            total = ((Number) row[0]).longValue();
+            open = ((Number) row[1]).longValue();
+            in_progress = ((Number) row[2]).longValue();
+            resolved = ((Number) row[3]).longValue();
+            critical = ((Number) row[4]).longValue();
         }
         return new DashboardMetricsDTO(total, open, in_progress, resolved, critical);
     }

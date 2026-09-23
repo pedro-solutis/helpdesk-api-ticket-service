@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import br.com.solutis.helpdesk.api_ticket_service.model.Category;
 import br.com.solutis.helpdesk.api_ticket_service.model.Priority;
@@ -11,8 +12,6 @@ import br.com.solutis.helpdesk.api_ticket_service.model.Status;
 import br.com.solutis.helpdesk.api_ticket_service.model.Ticket;
 
 public interface TicketRepository extends JpaRepository<Ticket, Long>{
-
-	Page<Ticket> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 
     @Query(
         "SELECT t FROM Ticket t WHERE " + 
@@ -32,20 +31,20 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>{
         Priority priority,
         Pageable pageable);
 
-    long countByStatusEquals(Status open);
-
-    long countByTechnicianId(Long userId);
-
-    long countByTechnicianIdAndStatusEquals(Long userId, Status resolved);
-
-    long countByCustomerId(Long userId);
-
-    long countByCustomerIdAndStatusEquals(Long userId, Status open);
-
-    long countByPriorityEquals(Priority priority);
-
-    long countByTechnicianIdAndPriorityEquals(Long userId, Priority priority);
-
-    long countByCustomerIdAndPriorityEquals(Long userId, Priority priority);
+    @Query (
+        value = 
+        "select " +
+            "count(*) as total_de_tickets, "+
+            "count(*) filter (where t.status = 'OPEN') as total_em_aberto, "+
+            "count(*) filter (where t.status IN ('IN_PROGRESS', 'WAITING')) as total_em_andamento, "+
+            "count(*) filter (where t.status IN ('RESOLVED', 'CLOSED')) as total_resolvidos, "+
+            "count(*) filter (where t.priority = 'CRITICAL') as total_critico "+
+        "from tickets t "+
+        "where :user_id IS NULL "+
+        "or t.customer_id = :user_id "+
+        "or t.technician_id = :user_id",
+        nativeQuery = true
+    )
+    Object[] getTicketMetrics(@Param("user_id") Long userId);
 
 }

@@ -57,7 +57,7 @@ public class TicketController {
         return ResponseEntity.ok(updatedTechnician);
     }
 
-    @PreAuthorize (value = "hasRole('CLIENT','ADMIN')")
+    @PreAuthorize (value = "hasAnyRole('CLIENT', 'ADMIN')")
     @PatchMapping("/{id}")
     @Transactional 
     public ResponseEntity<TicketDetailDTO> closeTicket(@PathVariable("id") Long ticketId){
@@ -87,9 +87,7 @@ public class TicketController {
 
     @GetMapping("/dashboard")
     public ResponseEntity<DashboardMetricsDTO> getDashboardMetrics(Authentication auth){
-        var userId = (Long) auth.getPrincipal();
-        var userRoles = auth.getAuthorities();
-        var metricsDTO = ticketService.getDashboardMetrics(userId, userRoles);
+        var metricsDTO = ticketService.getDashboardMetrics(auth);
         return ResponseEntity.ok(metricsDTO);
     }
 
