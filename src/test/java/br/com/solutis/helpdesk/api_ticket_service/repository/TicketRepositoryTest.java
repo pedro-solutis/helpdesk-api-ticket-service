@@ -34,34 +34,15 @@ public class TicketRepositoryTest {
     @MockitoBean
     private RabbitTemplate rabbitTemplate;
 
+    @org.junit.jupiter.api.BeforeEach
+    void setUp() {
+        ticketRepository.deleteAll();
+    }
+
     private Ticket createTicketAndPersist(String title, Category category, Priority priority, Long customerId) {
         TicketRegistrationDTO dto = new TicketRegistrationDTO(title, "Test Description", category.name(), priority.name(), customerId);
         Ticket ticket = new Ticket(dto);
         return ticketRepository.save(ticket);
-    }
-
-    @Test
-    @DisplayName("Should find tickets by exact customer ID")
-    void testFindAllByCustomerId() {
-        createTicketAndPersist("Ticket 1", Category.SOFTWARE, Priority.LOW, 10L);
-        createTicketAndPersist("Ticket 2", Category.HARDWARE, Priority.HIGH, 20L);
-
-        Page<Ticket> page = ticketRepository.findAllByCustomerId(10L, PageRequest.of(0, 10));
-
-        assertThat(page.getContent()).hasSize(1);
-        assertThat(page.getContent().get(0).getCustomerId()).isEqualTo(10L);
-    }
-
-    @Test
-    @DisplayName("Should find tickets containing title ignoring case")
-    void testFindByTitleContainingIgnoreCase() {
-        createTicketAndPersist("Network is down", Category.NETWORK, Priority.HIGH, 10L);
-        createTicketAndPersist("Keyboard broken", Category.HARDWARE, Priority.LOW, 10L);
-
-        Page<Ticket> page = ticketRepository.findByTitleContainingIgnoreCase("nEtWorK", PageRequest.of(0, 10));
-
-        assertThat(page.getContent()).hasSize(1);
-        assertThat(page.getContent().get(0).getTitle()).isEqualTo("Network is down");
     }
 
     @Test
@@ -71,11 +52,33 @@ public class TicketRepositoryTest {
         createTicketAndPersist("Ticket B", Category.NETWORK, Priority.HIGH, 10L);
         createTicketAndPersist("Ticket C", Category.SOFTWARE, Priority.LOW, 10L);
 
-        Page<Ticket> onlyCategory = ticketRepository.filterTickets(null, Category.SOFTWARE, null, PageRequest.of(0, 10));
+        Page<Ticket> onlyCategory = ticketRepository.filterTickets(null, null, null, null, Category.SOFTWARE, null, PageRequest.of(0, 10));
         assertThat(onlyCategory.getContent()).hasSize(2);
 
-        Page<Ticket> categoryAndPriority = ticketRepository.filterTickets(null, Category.SOFTWARE, Priority.HIGH, PageRequest.of(0, 10));
+        Page<Ticket> categoryAndPriority = ticketRepository.filterTickets(null, null, null, null, Category.SOFTWARE, Priority.HIGH, PageRequest.of(0, 10));
         assertThat(categoryAndPriority.getContent()).hasSize(1);
         assertThat(categoryAndPriority.getContent().get(0).getTitle()).isEqualTo("Ticket A");
+    }
+
+    @Test
+    @DisplayName("Should return correct metrics for tickets")
+    void testGetTicketMetrics() {
+        ticketRepository.deleteAll();
+
+        createTicketAndPersist("Ticket A", Category.SOFTWARE, Priority.CRITICAL, 10L); 
+        Ticket t2 = createTicketAndPersist("Ticket B", Category.NETWORK, Priority.HIGH, 10L);
+        t2.assignTechnician(new br.com.solutis.helpdesk.api_ticket_service.dto.ticket.AssignTechnicianDTO(20L)); 
+        ticketRepository.save(t2);
+
+        Object[] metrics = ticketRepository.getTicketMetrics(null);
+        assertThat(metrics).isNotNull();
+        
+        Object[] row = (metrics[0] instanceof Object[]) ? (Object[]) metrics[0] : metrics;
+        
+        assertThat(((Number) row[0]).longValue()).isEqualTo(2L);
+        assertThat(((Number) row[1]).longValue()).isEqualTo(1L);
+        assertThat(((Number) row[2]).longValue()).isEqualTo(1L);
+        assertThat(((Number) row[3]).longValue()).isEqualTo(0L);
+        assertThat(((Number) row[4]).longValue()).isEqualTo(1L);
     }
 }

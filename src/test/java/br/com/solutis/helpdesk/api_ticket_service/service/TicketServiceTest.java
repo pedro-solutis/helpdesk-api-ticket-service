@@ -15,8 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-
 import java.util.List;
 
 import br.com.solutis.helpdesk.api_ticket_service.dto.ticket.AssignTechnicianDTO;
@@ -142,31 +140,24 @@ public class TicketServiceTest {
     @DisplayName("Should close ticket and trigger event")
     public void testCloseTicket(){
         Ticket mockTicket = createMockTicket();
+        mockTicket.assignTechnician(new AssignTechnicianDTO(20L));
+        mockTicket.updateTicket(new TicketUpdateDTO(null, null, null, Status.RESOLVED.name()));
+        
         when(ticketRepository.findById(1L)).thenReturn(Optional.of(mockTicket));
         when(ticketRepository.save(any(Ticket.class))).thenReturn(mockTicket);
 
         TicketDetailDTO result = ticketService.closeTicket(1L);
 
         assertEquals(Status.CLOSED, result.status());
-        verify(ticketEventProducer).ticketStatusChangedEvent(eq(mockTicket), eq(Status.OPEN));
-    }
-
-    @Test
-    public void testGetAllTicketByCustomerId(){
-        Page<Ticket> page = new PageImpl<>(List.of(createMockTicket()));
-        when(ticketRepository.findAllByCustomerId(eq(10L), any(Pageable.class))).thenReturn(page);
-
-        Page<TicketListDTO> result = ticketService.getAllTicketByCustomerId(10L, PageRequest.of(0, 10));
-
-        assertEquals(1, result.getContent().size());
+        verify(ticketEventProducer).ticketStatusChangedEvent(eq(mockTicket), eq(Status.RESOLVED));
     }
 
     @Test
     public void testGetAllTickets(){
         Page<Ticket> page = new PageImpl<>(List.of(createMockTicket()));
-        when(ticketRepository.findAll(any(Pageable.class))).thenReturn(page);
+        when(ticketRepository.filterTickets(any(), any(), any(), any(), any(), any(), any())).thenReturn(page);
 
-        Page<TicketListDTO> result = ticketService.getAllTickets(PageRequest.of(0, 10));
+        Page<TicketListDTO> result = ticketService.getAllTickets(null, null, null, null, null, null, PageRequest.of(0, 10));
 
         assertEquals(1, result.getContent().size());
     }
@@ -189,26 +180,6 @@ public class TicketServiceTest {
     }
 
     @Test
-    public void testSearchTicketByTitle(){
-        Page<Ticket> page = new PageImpl<>(List.of(createMockTicket()));
-        when(ticketRepository.findByTitleContainingIgnoreCase(eq("Issue"), any(Pageable.class))).thenReturn(page);
-
-        Page<TicketListDTO> result = ticketService.searchTicketByTitle("Issue", PageRequest.of(0, 10));
-
-        assertEquals(1, result.getContent().size());
-    }
-    
-    @Test
-    public void testFilterTickets(){
-        Page<Ticket> page = new PageImpl<>(List.of(createMockTicket()));
-        when(ticketRepository.filterTickets(any(), any(), any(), any())).thenReturn(page);
-
-        Page<TicketListDTO> result = ticketService.filterTickets(Status.OPEN, null, null, PageRequest.of(0, 10));
-
-        assertEquals(1, result.getContent().size());
-    }
-
-    @Test
     public void testDeleteTicket() {
         Ticket mockTicket = createMockTicket();
         when(ticketRepository.findById(1L)).thenReturn(Optional.of(mockTicket));
@@ -219,5 +190,44 @@ public class TicketServiceTest {
         assertEquals(Status.CLOSED, mockTicket.getStatus());
         verify(ticketRepository).save(mockTicket);
         verify(ticketEventProducer).ticketStatusChangedEvent(eq(mockTicket), eq(Status.OPEN));
+    }
+
+    @Test
+    @DisplayName("Should return dashboard metrics for ADMIN")
+    void testGetDashboardMetrics_Admin() {
+        org.springframework.security.core.Authentication auth = mock(org.springframework.security.core.Authentication.class);
+        org.springframework.security.core.GrantedAuthority authority = new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_ADMIN");
+        doReturn(java.util.List.of(authority)).when(auth).getAuthorities();
+
+        Object[] mockResult = new Object[]{10L, 5L, 2L, 3L, 1L};
+        when(ticketRepository.getTicketMetrics(null)).thenReturn(mockResult);
+
+        br.com.solutis.helpdesk.api_ticket_service.dto.ticket.DashboardMetricsDTO result = ticketService.getDashboardMetrics(auth);
+
+        assertEquals(10L, result.total());
+        assertEquals(5L, result.open());
+        assertEquals(2L, result.in_progess());
+        assertEquals(3L, result.resolved());
+        assertEquals(1L, result.critical());
+    }
+
+    @Test
+    @DisplayName("Should return dashboard metrics for TECHNICIAN")
+    void testGetDashboardMetrics_Technician() {
+        org.springframework.security.core.Authentication auth = mock(org.springframework.security.core.Authentication.class);
+        org.springframework.security.core.GrantedAuthority authority = new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_TECHNICIAN");
+        doReturn(java.util.List.of(authority)).when(auth).getAuthorities();
+        when(auth.getPrincipal()).thenReturn(1L);
+
+        Object[] mockResult = new Object[]{new Object[]{5L, 2L, 1L, 2L, 0L}};
+        when(ticketRepository.getTicketMetrics(1L)).thenReturn(mockResult);
+
+        br.com.solutis.helpdesk.api_ticket_service.dto.ticket.DashboardMetricsDTO result = ticketService.getDashboardMetrics(auth);
+
+        assertEquals(5L, result.total());
+        assertEquals(2L, result.open());
+        assertEquals(1L, result.in_progess());
+        assertEquals(2L, result.resolved());
+        assertEquals(0L, result.critical());
     }
 }
