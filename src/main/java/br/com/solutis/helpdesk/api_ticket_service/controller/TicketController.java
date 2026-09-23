@@ -42,7 +42,6 @@ public class TicketController {
         return ResponseEntity.created(uri).body(createdTicket);
     }
 
-    @PreAuthorize (value = "hasAnyRole('CLIENT', 'TECHNICIAN')")
     @PutMapping("/{id}")
     @Transactional 
     public ResponseEntity<TicketDetailDTO> updateTicket(@PathVariable Long id, @RequestBody @Valid TicketUpdateDTO ticket){
@@ -58,7 +57,7 @@ public class TicketController {
         return ResponseEntity.ok(updatedTechnician);
     }
 
-    @PreAuthorize (value = "hasRole('TECHNICIAN')")
+    @PreAuthorize (value = "hasRole('CLIENT','ADMIN')")
     @PatchMapping("/{id}")
     @Transactional 
     public ResponseEntity<TicketDetailDTO> closeTicket(@PathVariable("id") Long ticketId){
@@ -80,14 +79,12 @@ public class TicketController {
         return ResponseEntity.ok(tickets);
     }
 
-    @PreAuthorize (value = "hasAnyRole('CLIENT', 'TECHNICIAN', 'ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<TicketDetailDTO> getTicketById(@PathVariable Long id){
         var ticket = ticketService.getTicketById(id);
         return ResponseEntity.ok(ticket);
     }
 
-    @PreAuthorize (value = "hasAnyRole('CLIENT', 'TECHNICIAN', 'ADMIN')")
     @GetMapping("/dashboard")
     public ResponseEntity<DashboardMetricsDTO> getDashboardMetrics(Authentication auth){
         var userId = (Long) auth.getPrincipal();
@@ -96,7 +93,7 @@ public class TicketController {
         return ResponseEntity.ok(metricsDTO);
     }
 
-    @PreAuthorize (value = "hasAnyRole('CLIENT', 'TECHNICIAN', 'ADMIN')")
+    @PreAuthorize (value = "hasAnyRole('CLIENT', 'ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteTicket(@PathVariable("id") Long ticketId){
         ticketService.deleteTicket(ticketId);
