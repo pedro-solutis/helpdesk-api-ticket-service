@@ -40,9 +40,10 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>{
             "count(*) filter (where t.status IN ('RESOLVED', 'CLOSED')) as total_resolvidos, "+
             "count(*) filter (where t.priority = 'CRITICAL') as total_critico "+
         "from tickets t "+
-        "where :user_id IS NULL "+
+        "where (:user_id IS NULL "+
         "or t.customer_id = :user_id "+
-        "or t.technician_id = :user_id",
+        "or t.technician_id = :user_id) "+
+        "and t.active = true ",
         nativeQuery = true
     )
     Object[] getTicketMetrics(@Param("user_id") Long userId);
