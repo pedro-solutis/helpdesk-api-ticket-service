@@ -6,6 +6,7 @@ import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
@@ -14,8 +15,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration 
 public class TicketAMQPConfiguration {
 
-    
-    public static final String EXCHANGE_NAME = "ticket.exchange";
+    @Value("${api.messager.exchange}")
+    public String exchangeName;
 
     @Bean
     public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
@@ -41,7 +42,7 @@ public class TicketAMQPConfiguration {
 
     @Bean
     public TopicExchange ticketEventsExchange() {
-        return new TopicExchange(EXCHANGE_NAME);
+        return new TopicExchange(exchangeName);
     }
 
 }

@@ -12,17 +12,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class TokenService {
 
-    @Value("${api.security.jwt.secret}")
+    @Value("${api.security.token.secret}")
     private String jwtSecret;
 
-    @Value("${api.security.jwt.issuer}")
-    private String ISSUER;
+    @Value("${api.security.token.issuer}")
+    private String issuer;
 
     public String validateToken(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(jwtSecret);
             return JWT.require(algorithm)
-                    .withIssuer(ISSUER)
+                    .withIssuer(issuer)
                     .build()
                     .verify(token)
                     .getSubject();
@@ -35,7 +35,7 @@ public class TokenService {
         try {
             Algorithm algorithm = Algorithm.HMAC256(jwtSecret);
             return JWT.require(algorithm)
-                    .withIssuer(ISSUER)
+                    .withIssuer(issuer)
                     .build()
                     .verify(token)
                     .getClaim("id")
@@ -48,7 +48,7 @@ public class TokenService {
     public List<String> getUserRoles(String token) {
         Algorithm algorithm = Algorithm.HMAC256(jwtSecret);
         var role = JWT.require(algorithm)
-                .withIssuer(ISSUER)
+                .withIssuer(issuer)
                 .build()
                 .verify(token)
                 .getClaim("role")
