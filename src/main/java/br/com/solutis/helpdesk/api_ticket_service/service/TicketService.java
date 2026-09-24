@@ -54,6 +54,7 @@ public class TicketService {
         var updatedTicket = ticketRepository.save(toUpdateTicket);
         if (ticketDto.status() != null)
             ticketEventProducer.ticketStatusChangedEvent(updatedTicket, lastStatus);
+        ticketEventProducer.ticketUpdatedEvent(updatedTicket);
         return new TicketDetailDTO(updatedTicket);
     }
 
@@ -128,10 +129,9 @@ public class TicketService {
     public void deleteTicket(Long ticketId) {
         var toDeleteTicket = ticketRepository.findById(ticketId).orElseThrow(() -> new ResourceNotFoundException("Ticket not founded"));
         toDeleteTicket.deleteTicket();
-        var lastStatus = toDeleteTicket.getStatus();
         toDeleteTicket.closeTicket();
         ticketRepository.save(toDeleteTicket);
-        ticketEventProducer.ticketStatusChangedEvent(toDeleteTicket, lastStatus);
+        ticketEventProducer.ticketDeletedEvent(toDeleteTicket);
     }
 
 }
