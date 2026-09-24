@@ -1,6 +1,7 @@
 package br.com.solutis.helpdesk.api_ticket_service.infra.amqp;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import br.com.solutis.helpdesk.api_ticket_service.dto.event.TicketEventDTO;
@@ -12,23 +13,36 @@ public class TicketEventProducer {
 
     private final RabbitTemplate rabbitTemplate;
 
+    @Value("${api.messager.exchange}")
+    private String exchangeName;
+
     public TicketEventProducer(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
     }
 
     public void ticketCreatedEvent(Ticket ticket) {
         TicketEventDTO event = createEventCreatedTicket(ticket, "ticketCreated");
-        rabbitTemplate.convertAndSend(TicketAMQPConfiguration.EXCHANGE_NAME, "ticket.created", event);
+        rabbitTemplate.convertAndSend(exchangeName, "ticket.created", event);
     }
 
     public void ticketAssignedEvent(Ticket ticket) {
         TicketEventDTO event = createEventAssignedTicket(ticket, "ticketAssigned");
-        rabbitTemplate.convertAndSend(TicketAMQPConfiguration.EXCHANGE_NAME, "ticket.assigned", event);
+        rabbitTemplate.convertAndSend(exchangeName, "ticket.assigned", event);
     }
 
     public void ticketStatusChangedEvent(Ticket ticket, Status lastStatus) {
         TicketEventDTO event = createEventStatusChangedTicket(ticket, lastStatus, "ticketStatusChanged");
-        rabbitTemplate.convertAndSend(TicketAMQPConfiguration.EXCHANGE_NAME, "ticket.status.changed", event);
+        rabbitTemplate.convertAndSend(exchangeName, "ticket.status.changed", event);
+    }
+
+    public void ticketUpdatedEvent(Ticket ticket) {
+        TicketEventDTO event = createEventTicketUpdated(ticket, "ticketUpdated");
+        rabbitTemplate.convertAndSend(exchangeName, "ticket.updated", event);
+    }
+
+    public void ticketDeletedEvent(Ticket ticket) {
+        TicketEventDTO event = createEventTicketDeleted(ticket, "ticketDeletion");
+        rabbitTemplate.convertAndSend(exchangeName, "ticket.deleted", event);
     }
 
     private TicketEventDTO createEventCreatedTicket(Ticket ticket, String eventType) {
@@ -37,7 +51,7 @@ public class TicketEventProducer {
             ticket.getCustomerId(),
             eventType,
             ticket.getTitle(),
-            "Ticket: " + ticket.getTitle() + " was created by user " + ticket.getTechnicianId()
+            "Ticket criado pelo cliente " + ticket.getCustomerId()
         );
     }
 
@@ -47,7 +61,7 @@ public class TicketEventProducer {
             ticket.getTechnicianId(),
             eventType,
             ticket.getTitle(),
-            "Ticket: " + ticket.getTitle() + " was assigned to user " + ticket.getTechnicianId()
+            "Ticket atribuido para o técnico " + ticket.getTechnicianId()
         );
     }
 
@@ -57,7 +71,27 @@ public class TicketEventProducer {
             ticket.getCustomerId(),
             eventType,
             ticket.getTitle(),
-            "Ticket: " + ticket.getTitle() + " status changed from " + lastStatus + " to "+ ticket.getStatus()
+            "Ticket status alterado de " + lastStatus + " para "+ ticket.getStatus()
+        );
+    }
+
+    private TicketEventDTO createEventTicketUpdated(Ticket ticket, String eventType){
+        return  new TicketEventDTO(
+            ticket.getId(), 
+            ticket.getCustomerId(),
+            eventType,
+            ticket.getTitle(),
+            "Ticket atualizado com sucesso"
+        );
+    }
+
+    private TicketEventDTO createEventTicketDeleted(Ticket ticket, String eventType){
+        return  new TicketEventDTO(
+            ticket.getId(), 
+            ticket.getCustomerId(),
+            eventType,
+            ticket.getTitle(),
+            "Ticket deletado com sucesso"
         );
     }
 }
