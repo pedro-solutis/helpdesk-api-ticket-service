@@ -5,9 +5,9 @@ spring:
   application:
     name: api-ticket-service
   datasource:
-    url: ${DATASOURCE_NAME:jdbc:postgresql://localhost:5432/ticket_db}
-    username: ${DATASOURCE_USERNAME:postgres}
-    password: ${DATASOURCE_PASSWORD:postgres}
+    url: ${DATASOURCE_NAME:jdbc:postgresql://localhost:5432/tickets_db}
+    username: ${DATASOURCE_USERNAME:root}
+    password: ${DATASOURCE_PASSWORD:root}
     driver-class-name: ${DATASOURCE_DRIVER:org.postgresql.Driver}
   jpa:
     show-sql: true
@@ -24,10 +24,8 @@ spring:
 
 api:
   security:
-    jwt:
+    token:
       secret: ${JWT_SECRET:mySuperSecretKey123!}
       issuer: ${JWT_ISSUER:user-service}
-
-springdoc:
-  servers:
-    - url: ${GATEWAY_URL:http://localhost:8080/api}
+  messager:
+    exchange: ${RABBIT_EXCHANGE:ticket.exchange}
